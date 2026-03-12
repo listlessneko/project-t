@@ -12,7 +12,9 @@ void start_game(Player *player) {
   player->attack = 5;
   player->defense = 3;
   printf("What is your name, traveler?\n");
+
   fgets(player->name, 32, stdin);
   player->name[strcspn(player->name, "\n")] = '\0';
-  printf("Hello, %s.\n", player->name);
+
+  printf("Hello, %s. It is time to begin your quest.\n", player->name);
 }
