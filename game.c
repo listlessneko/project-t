@@ -4,6 +4,7 @@
 #include <time.h>
 #include "game.h"
 #include "utils.h"
+#include "rooms.h"
 
 void start_game(Player *player) {
   srand(time(NULL));
@@ -20,7 +21,12 @@ void start_game(Player *player) {
   fgets(player->name, 32, stdin);
   player->name[strcspn(player->name, "\n")] = '\0';
 
-  print_text(PRINT_NORMAL5, "Hello, %s. It is time to begin your quest.\n", player->name);
-  print_text(PRINT_VERY_SLOW100, "...\n");
-  print_text(PRINT_NORMAL5, "You find yourself standing at the entrance of a castle.\n");
+  print_text(PRINT_NORMAL5, "Hello, %s. It is time to continue your journey.\n", player->name);
+  print_text(PRINT_VERY_SLOW50, "...\n");
+  print_text(PRINT_NORMAL5, "You find yourself sitting in the middle of a forest.\n");
+  print_text(PRINT_NORMAL5, "You've been resting your strained back against a large tree while letting your mind wander off.\n");
+  print_text(PRINT_NORMAL5, "The breaking sound of a distant tree branch snaps you back to reality.\n");
+  print_text(PRINT_NORMAL5, "You have to keep moving before the sun sets.\n");
+
+  explore(player);
 }

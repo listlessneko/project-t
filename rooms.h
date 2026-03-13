@@ -15,5 +15,7 @@ typedef struct Room {
   Item *items;
 } Room;
 
+extern char *directions[];
+
 void explore(Player *player);
 void view_map(Player *player);
