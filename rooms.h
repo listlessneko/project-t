@@ -1,5 +1,11 @@
 #pragma once
 
+// A way to track how many rooms have been generated so far
+// A function that generates a new room and returns a pointer to it
+// Logic in explore that checks if a direction exists, generates if not, then moves the player
+
+#define MAX_ROOMS 10
+
 typedef struct Player Player;
 typedef struct Enemy Enemy;
 typedef struct Item Item;
@@ -13,9 +19,12 @@ typedef struct Room {
   struct Room *south;
   Enemy *enemy;
   Item *items;
+  int visited;
 } Room;
 
 extern char *directions[];
 
-void explore(Player *player);
+int explore(Player *player);
+void explore_room(Player *player, int choice);
+Room *generate_room(void);
 void view_map(Player *player);
