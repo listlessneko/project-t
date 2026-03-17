@@ -22,6 +22,11 @@ typedef struct Room {
   int visited;
 } Room;
 
+typedef struct RoomTemplate {
+  char *name;
+  char *description;
+} RoomTemplate;
+
 extern char *directions[];
 
 int explore(Player *player);
