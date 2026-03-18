@@ -16,7 +16,8 @@ void start_game(Player *player) {
   player->defense = 3;
   player->gold = 0;
   player->inventory_count = 0;
-  player->current_room = generate_room();
+  player->current_room = generate_room(player);
+  player->visited_rooms->count = 0;
   print_text(PRINT_NORMAL5, "What is your name, traveler?\n");
 
   fgets(player->name, 32, stdin);

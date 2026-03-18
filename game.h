@@ -27,6 +27,7 @@ typedef struct Player {
   Item inventory[12];
   int inventory_count;
   Room *current_room;
+  VisitedRooms visited_rooms[MAX_ROOMS];
 } Player;
 
 

@@ -6,6 +6,13 @@
 
 #define MAX_ROOMS 10
 
+typedef enum RoomKind {
+  SAFE,
+  EASY,
+  NORMAL,
+  HARD,
+} RoomKind;
+
 typedef struct Player Player;
 typedef struct Enemy Enemy;
 typedef struct Item Item;
@@ -13,6 +20,7 @@ typedef struct Item Item;
 typedef struct Room {
   char name[50];
   char description[256];
+  RoomKind kind;
   struct Room *north;
   struct Room *east;
   struct Room *west;
@@ -25,11 +33,17 @@ typedef struct Room {
 typedef struct RoomTemplate {
   char *name;
   char *description;
+  RoomKind kind;
 } RoomTemplate;
+
+typedef struct VisitedRooms {
+  Room *visited[MAX_ROOMS];
+  int count;
+} VisitedRooms;
 
 extern char *directions[];
 
 int explore(Player *player);
 void explore_room(Player *player, int choice);
-Room *generate_room(void);
+Room *generate_room(Player *player);
 void view_map(Player *player);

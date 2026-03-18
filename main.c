@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "game.h"
 #include "rooms.h"
 
