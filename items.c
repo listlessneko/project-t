@@ -1,3 +1,7 @@
+#include <stddef.h>
+#include "items.h"
+
 Item create_item() {
-  return NULL;
+  Item empty = {0};
+  return empty;
 }

@@ -1,8 +1,15 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g
 
-project-t: main.c game.c utils.c
-	$(CC) $(CFLAGS) -o project-t main.c game.c utils.c rooms.c
+SRCS = $(wildcard *.c)
+OBJS = $(SRCS:.c=.o)
+TARGET = project-t
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f project-t
+	rm -f $(OBJS) $(TARGET)

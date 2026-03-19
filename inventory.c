@@ -1,3 +1,5 @@
+#include "game.h"
+
 void view_inventory(Player *player) {
   return;
 }
