@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "game.h"
 #include "rooms.h"
+#include "terminal.h"
 #include "utils.h"
 
 int room_count = 0;
@@ -106,14 +107,15 @@ Room *generate_room(Player *player) {
 
 
 int explore(Player *player) {
-  print_text(PRINT_FAST3, "[1] Go north\n");
-  print_text(PRINT_FAST3, "[2] Go east\n");
-  print_text(PRINT_FAST3, "[3] Go west\n");
-  print_text(PRINT_FAST3, "[4] Go south\n");
+  print_text(PRINT_FAST3,
+             "[1] Go north\n"
+             "[2] Go east\n"
+             "[3] Go west\n"
+             "[4] Go south\n"
+             );
 
   char choice[32];
-  fgets(choice, sizeof(choice), stdin);
-  choice[strcspn(choice, "\n")] = '\0';
+  read_input(choice, sizeof(choice));
 
   int choice_int = atoi(choice);
   if (choice_int >= 1 && choice_int <= 4) {

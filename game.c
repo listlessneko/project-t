@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "terminal.h"
 #include "game.h"
 #include "utils.h"
 #include "rooms.h"
@@ -16,12 +17,11 @@ void start_game(Player *player) {
   player->defense = 3;
   player->gold = 0;
   player->inventory_count = 0;
-  player->current_room = generate_room(player);
   player->visited_rooms->count = 0;
+  player->current_room = generate_room(player);
   print_text(PRINT_NORMAL5, "What is your name, traveler?\n");
 
-  fgets(player->name, 32, stdin);
-  player->name[strcspn(player->name, "\n")] = '\0';
+  read_input(player->name, 32);
 
   print_text(PRINT_NORMAL5, "Hello, %s. It is time to continue your journey.\n", player->name);
   print_text(PRINT_VERY_SLOW50, "...\n");
