@@ -17,8 +17,14 @@ void start_game(Player *player) {
   player->defense = 3;
   player->gold = 0;
   player->inventory_count = 0;
+  player->visited_rooms = malloc(sizeof(VisitedRooms));
+  if (player->visited_rooms == NULL) {
+    return;
+  }
   player->visited_rooms->count = 0;
   player->current_room = generate_room(player);
+  player->visited_rooms->visited[0] = player->current_room;
+  player->visited_rooms->count = 1;
   print_text(PRINT_NORMAL5, "What is your name, traveler?\n");
 
   read_input(player->name, 32);

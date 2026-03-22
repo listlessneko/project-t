@@ -85,9 +85,17 @@ void explore_room(Player *player, int choice) {
   }
 
   if (*next == NULL && player->visited_rooms->count < MAX_ROOMS) {
+    printf("visited_count: %d\n", player->visited_rooms->count);
+    printf("max_count: %d\n", MAX_ROOMS);
     *next = generate_room(player);
+    player->visited_rooms->visited[(*next)->id] = *next;
+    player->visited_rooms->count++;
+    player->current_room = *next;
+  } else if (*next != NULL) {
+    player->current_room = *next;
+  } else {
+    print_text(PRINT_NORMAL5, "You've reached a dead end. Somehow...\n");
   }
-  player->current_room = *next;
 }
 
 Room *generate_room(Player *player) {
@@ -97,7 +105,7 @@ Room *generate_room(Player *player) {
       return NULL;
     }
     // room attributes
-    room_count++;
+    new_room->id = player->visited_rooms->count + 1;
     new_room->visited = 0;
     return new_room;
   } else {

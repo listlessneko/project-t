@@ -20,6 +20,7 @@ typedef struct Item Item;
 typedef struct Room {
   char name[50];
   char description[256];
+  int id;
   RoomKind kind;
   struct Room *north;
   struct Room *east;
