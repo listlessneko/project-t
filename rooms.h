@@ -46,5 +46,5 @@ extern char *directions[];
 
 int explore(Player *player);
 void explore_room(Player *player, int choice);
-Room *generate_room(Player *player);
+Room *generate_room(Player *player, int choice);
 void view_map(Player *player);

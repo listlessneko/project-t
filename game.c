@@ -22,7 +22,7 @@ void start_game(Player *player) {
     return;
   }
   player->visited_rooms->count = 0;
-  player->current_room = generate_room(player);
+  player->current_room = generate_room(player, -1);
   player->visited_rooms->visited[0] = player->current_room;
   player->visited_rooms->count = 1;
   print_text(PRINT_NORMAL5, "What is your name, traveler?\n");

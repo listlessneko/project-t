@@ -87,7 +87,7 @@ void explore_room(Player *player, int choice) {
   if (*next == NULL && player->visited_rooms->count < MAX_ROOMS) {
     printf("visited_count: %d\n", player->visited_rooms->count);
     printf("max_count: %d\n", MAX_ROOMS);
-    *next = generate_room(player);
+    *next = generate_room(player, choice);
     player->visited_rooms->visited[(*next)->id] = *next;
     player->visited_rooms->count++;
     player->current_room = *next;
@@ -98,13 +98,21 @@ void explore_room(Player *player, int choice) {
   }
 }
 
-Room *generate_room(Player *player) {
+Room *generate_room(Player *player, int choice) {
   if (player->visited_rooms->count < MAX_ROOMS) {
     Room *new_room = malloc(sizeof(Room));
     if (new_room == NULL) {
       return NULL;
     }
-    // room attributes
+    if (choice == 1) {
+      new_room->south = player->current_room;
+    } else if (choice == 2) {
+      new_room->west = player->current_room;
+    } else if (choice == 3) {
+      new_room->east = player->current_room;
+    } else if (choice == 4) {
+      new_room->north = player->current_room;
+    }
     new_room->id = player->visited_rooms->count + 1;
     new_room->visited = 0;
     return new_room;
