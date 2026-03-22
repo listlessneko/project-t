@@ -9,7 +9,7 @@
 int room_count = 0;
 
 char *directions[] = { "north", "east", "west", "south" };
-RoomTemplate room_templates[] = {
+RoomAppearanceTemplate room_appearance_templates[] = {
   {
     .name = "Grove",
     .description = "This is a grove...",
@@ -68,6 +68,69 @@ RoomTemplate room_templates[] = {
   {
     .name = "Wens Village",
     .description = "This is Wens Village...",
+    .kind = HARD
+  },
+};
+
+RoomContentsTemplate room_contents_templates[] = {
+  {
+    .enemy = NULL,
+    .items = NULL,
+    .kind = SAFE
+  },
+  {
+    .enemy = NULL,
+    .items = NULL,
+    .kind = EASY
+  },
+  {
+    .enemy = NULL,
+    .items = NULL,
+    .kind = EASY
+  },
+  {
+    .enemy = NULL,
+    .items = NULL,
+    .kind = EASY
+  },
+  {
+    .enemy = NULL,
+    .items = NULL,
+    .kind = NORMAL
+  },
+  {
+    .enemy = NULL,
+    .items = NULL,
+    .kind = NORMAL
+  },
+  {
+    .enemy = NULL,
+    .items = NULL,
+    .kind = NORMAL
+  },
+  {
+    .enemy = NULL,
+    .items = NULL,
+    .kind = NORMAL
+  },
+  {
+    .enemy = NULL,
+    .items = NULL,
+    .kind = NORMAL
+  },
+  {
+    .enemy = NULL,
+    .items = NULL,
+    .kind = HARD
+  },
+  {
+    .enemy = NULL,
+    .items = NULL,
+    .kind = HARD
+  },
+  {
+    .enemy = NULL,
+    .items = NULL,
     .kind = HARD
   },
 };

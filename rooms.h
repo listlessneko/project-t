@@ -31,11 +31,17 @@ typedef struct Room {
   int visited;
 } Room;
 
-typedef struct RoomTemplate {
+typedef struct RoomAppearanceTemplate {
   char *name;
   char *description;
   RoomKind kind;
-} RoomTemplate;
+} RoomAppearanceTemplate;
+
+typedef struct RoomContentsTemplate {
+  Enemy *enemy;
+  Item *items;
+  RoomKind kind;
+} RoomContentsTemplate;
 
 typedef struct VisitedRooms {
   Room *visited[MAX_ROOMS];
