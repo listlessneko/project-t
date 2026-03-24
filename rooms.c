@@ -289,10 +289,11 @@ Room *generate_room(Player *player, int choice) {
     strcpy(new_room->description, fateful_room_appearance.description);
 
     RoomContentsTemplate fateful_room_contents = room_kind_contents_templates[0];
-    strcpy(new_room->enemy->name, fateful_room_contents.enemy_name);
-    new_room->enemy->max_health = rand() % (fateful_room_contents.enemy_max_health - fateful_room_contents.enemy_min_health + 1) + fateful_room_contents.enemy_min_health;
-    new_room->enemy->attack = rand() % (fateful_room_contents.enemy_max_attack - fateful_room_contents.enemy_min_attack + 1) + fateful_room_contents.enemy_min_attack;
-    new_room->enemy->defense = rand() % (fateful_room_contents.enemy_max_defense - fateful_room_contents.enemy_min_defense + 1) + fateful_room_contents.enemy_min_defense;
+    int fateful_max_health = rand() % (fateful_room_contents.enemy_max_health - fateful_room_contents.enemy_min_health + 1) + fateful_room_contents.enemy_min_health;
+    int fateful_attack = rand() % (fateful_room_contents.enemy_max_attack - fateful_room_contents.enemy_min_attack + 1) + fateful_room_contents.enemy_min_attack;
+    int fateful_defense = rand() % (fateful_room_contents.enemy_max_defense - fateful_room_contents.enemy_min_defense + 1) + fateful_room_contents.enemy_min_defense;
+    Enemy *enemy = create_enemy(fateful_room_contents.enemy_name, fateful_max_health, fateful_attack, fateful_defense);
+    new_room->enemy = enemy;
   }
 
   if (choice == 1) {

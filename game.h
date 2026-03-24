@@ -32,5 +32,8 @@ typedef struct Player {
 
 
 void start_game(Player *player);
+Player *create_player();
+Enemy *create_enemy(char *name, int max_health, int attack, int defense);
+void destroy_enemy(Enemy *enemy);
 void game_loop(Player *player);
 void combat(Player *player, Enemy *enemy);

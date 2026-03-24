@@ -7,8 +7,11 @@
 #include "utils.h"
 #include "rooms.h"
 
-void start_game(Player *player) {
-  srand(time(NULL));
+Player *create_player() {
+  Player *player = malloc(sizeof(Player));
+  if (player == NULL) {
+    return NULL;
+  }
   player->level = 1;
   player->exp = 0;
   player->health = 30;
@@ -19,9 +22,32 @@ void start_game(Player *player) {
   player->inventory_count = 0;
   player->visited_rooms = malloc(sizeof(VisitedRooms));
   if (player->visited_rooms == NULL) {
-    return;
+    free(player);
+    return NULL;
   }
   player->visited_rooms->count = 0;
+  return player;
+};
+
+Enemy *create_enemy(char *name, int max_health, int attack, int defense) {
+  Enemy *enemy = malloc(sizeof(Enemy));
+  if (enemy == NULL) {
+    return NULL;
+  }
+  strcpy(enemy->name, name);
+  enemy->max_health = max_health;
+  enemy->health = max_health;
+  enemy->attack = attack;
+  enemy->defense = defense;
+  return enemy;
+};
+
+void destroy_enemy(Enemy *enemy) {
+  free(enemy);
+}
+
+void start_game(Player *player) {
+  srand(time(NULL));
   print_text(PRINT_NORMAL5, "What is your name, traveler?\n");
 
   read_input(player->name, 32);
