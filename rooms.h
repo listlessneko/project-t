@@ -7,7 +7,7 @@
 #define MAX_ROOMS 12
 #define MAX_SAFE_ROOMS 1
 #define MAX_EASY_ROOMS 3
-#define MAX_NORMAL_ROOMS 3
+#define MAX_NORMAL_ROOMS 5
 #define MAX_HARD_ROOMS 3
 
 typedef enum RoomKind {

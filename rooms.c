@@ -155,31 +155,27 @@ void explore_room(Player *player, int choice) {
     next = &player->current_room->south;
   }
 
-  if (player->visited_rooms->count < MAX_ROOMS) {
-    if (*next == NULL) {
-      printf("visited_count: %d\n", player->visited_rooms->count);
-      printf("max_count: %d\n", MAX_ROOMS);
+  if (*next == NULL) {
+    if (player->visited_rooms->count < MAX_ROOMS) {
       *next = generate_room(player, choice);
       player->visited_rooms->visited[(*next)->id] = *next;
       player->visited_rooms->visited[(*next)->id]->visited = 1;
       player->visited_rooms->count++;
-    }
-    player->current_room = *next;
-    if (player->current_room->kind == SAFE) {
-      print_text(PRINT_NORMAL5,
-                 "[Entered %s]\n",
-                 "%s\n",
-                 player->current_room->name,
-                 player->current_room->description
-                 );
+      player->current_room = *next;
     } else {
-      print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);
-      print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
-      print_text(PRINT_NORMAL5, "You see a %s\n", player->current_room->enemy->name);
-      print_text(PRINT_NORMAL5, "Health: %d\n", player->current_room->enemy->health);
+      print_text(PRINT_NORMAL5, "You've reached a dead end. Somehow...\n");
     }
   } else {
-    print_text(PRINT_NORMAL5, "You've reached a dead end. Somehow...\n");
+    player->current_room = *next;
+  }
+  if (player->current_room->kind == SAFE) {
+    print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);
+    print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
+  } else {
+    print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);
+    print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
+    print_text(PRINT_NORMAL5, "You see a %s\n", player->current_room->enemy->name);
+    print_text(PRINT_NORMAL5, "Health: %d\n", player->current_room->enemy->health);
   }
 }
 
@@ -197,9 +193,7 @@ Room *generate_room(Player *player, int choice) {
   } else {
 
     int visited_count = player->visited_rooms->count;
-    printf("visited_count: %d\n", visited_count);
     RoomKind current_room_kind = player->current_room->kind;
-    printf("current_room_kind: %d\n", current_room_kind);
 
     if (visited_count > MAX_ROOMS) {
       return NULL;
@@ -226,9 +220,6 @@ Room *generate_room(Player *player, int choice) {
         break;
     }
 
-    printf("max_room_kind: %d\n", max_room_kind);
-    printf("room_kind_count: %d\n", room_kind_count);
-
     if (room_kind_count >= max_room_kind) {
       current_room_kind = (RoomKind)(current_room_kind + 1);
       switch (current_room_kind) {
@@ -245,9 +236,6 @@ Room *generate_room(Player *player, int choice) {
           max_room_kind = MAX_HARD_ROOMS;
           break;
       }
-      if (current_room_kind >= HARD) {
-        return NULL;
-      }
     }
 
     new_room = malloc(sizeof(Room));
@@ -255,40 +243,35 @@ Room *generate_room(Player *player, int choice) {
       return NULL;
     }
 
-    RoomAppearanceTemplate *room_kind_appearance_templates;
-    RoomContentsTemplate *room_kind_contents_templates;
-    printf("current_room_kind: %d\n", current_room_kind);
-    switch (current_room_kind) {
+    new_room->kind = current_room_kind;
+    int appearance_index = rand() % max_room_kind;
+    RoomAppearanceTemplate fateful_room_appearance;
+    RoomContentsTemplate fateful_room_contents;
+    switch (new_room->kind) {
       case SAFE:
         room_kind_counter.safe++;
-        room_kind_appearance_templates = safe_room_appearance_templates;
-        room_kind_contents_templates = safe_room_contents_templates;
+        fateful_room_appearance = safe_room_appearance_templates[appearance_index];
+        fateful_room_contents = safe_room_contents_templates[0];
         break;
       case EASY:
         room_kind_counter.easy++;
-        room_kind_appearance_templates = easy_room_appearance_templates;
-        room_kind_contents_templates = easy_room_contents_templates;
+        fateful_room_appearance = easy_room_appearance_templates[appearance_index];
+        fateful_room_contents = easy_room_contents_templates[0];
         break;
       case NORMAL:
         room_kind_counter.normal++;
-        room_kind_appearance_templates = normal_room_appearance_templates;
-        room_kind_contents_templates = normal_room_contents_templates;
+        fateful_room_appearance = normal_room_appearance_templates[appearance_index];
+        fateful_room_contents = normal_room_contents_templates[0];
         break;
       case HARD:
         room_kind_counter.hard++;
-        room_kind_appearance_templates = hard_room_appearance_templates;
-        room_kind_contents_templates = hard_room_contents_templates;
-        break;
+        fateful_room_appearance = hard_room_appearance_templates[room_kind_counter.hard - 1];
+        fateful_room_contents = hard_room_contents_templates[0];
+
     }
 
-    int appearance_index = rand() % max_room_kind;
-    printf("appearance_index: %d\n", appearance_index);
-    RoomAppearanceTemplate fateful_room_appearance = room_kind_appearance_templates[appearance_index];
-    printf("Room Name: %s\n", fateful_room_appearance.name);
     strcpy(new_room->name, fateful_room_appearance.name);
     strcpy(new_room->description, fateful_room_appearance.description);
-
-    RoomContentsTemplate fateful_room_contents = room_kind_contents_templates[0];
     int fateful_max_health = rand() % (fateful_room_contents.enemy_max_health - fateful_room_contents.enemy_min_health + 1) + fateful_room_contents.enemy_min_health;
     int fateful_attack = rand() % (fateful_room_contents.enemy_max_attack - fateful_room_contents.enemy_min_attack + 1) + fateful_room_contents.enemy_min_attack;
     int fateful_defense = rand() % (fateful_room_contents.enemy_max_defense - fateful_room_contents.enemy_min_defense + 1) + fateful_room_contents.enemy_min_defense;
@@ -305,7 +288,7 @@ Room *generate_room(Player *player, int choice) {
   } else if (choice == 4) {
     new_room->north = player->current_room;
   }
-  new_room->id = player->visited_rooms->count + 1;
+  new_room->id = player->visited_rooms->count;
   new_room->visited = 0;
   return new_room;
 }
