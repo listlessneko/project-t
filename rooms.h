@@ -4,7 +4,11 @@
 // A function that generates a new room and returns a pointer to it
 // Logic in explore that checks if a direction exists, generates if not, then moves the player
 
-#define MAX_ROOMS 10
+#define MAX_ROOMS 12
+#define MAX_SAFE_ROOMS 1
+#define MAX_EASY_ROOMS 3
+#define MAX_NORMAL_ROOMS 3
+#define MAX_HARD_ROOMS 3
 
 typedef enum RoomKind {
   SAFE,
@@ -12,6 +16,20 @@ typedef enum RoomKind {
   NORMAL,
   HARD,
 } RoomKind;
+
+typedef struct RoomKindCounter {
+  int safe;
+  int easy;
+  int normal;
+  int hard;
+} RoomKindCounter;
+
+typedef struct RoomKindLimits {
+  int safe;
+  int easy;
+  int normal;
+  int hard;
+} RoomKindLimits;
 
 typedef struct Player Player;
 typedef struct Enemy Enemy;
@@ -38,7 +56,13 @@ typedef struct RoomAppearanceTemplate {
 } RoomAppearanceTemplate;
 
 typedef struct RoomContentsTemplate {
-  Enemy *enemy;
+  char *enemy_name;
+  int enemy_max_health;
+  int enemy_min_health;
+  int enemy_max_attack;
+  int enemy_min_attack;
+  int enemy_max_defense;
+  int enemy_min_defense;
   Item *items;
   RoomKind kind;
 } RoomContentsTemplate;
