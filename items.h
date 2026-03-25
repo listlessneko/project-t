@@ -8,24 +8,20 @@ typedef enum {
 } ItemKind;
 
 typedef struct Weapon {
-  char name[32];
   int attack_bonus;
 } Weapon;
 
 typedef struct Armor {
-  char name[32];
   int defense_bonus;
 } Armor;
 
 typedef struct Potion {
-  char name[32];
   int health_bonus;
   int attack_bonus;
   int defense_bonus;
 } Potion;
 
 typedef struct Accessory {
-  char name[32];
   int attack_bonus;
   int defense_bonus;
 } Accessory;
@@ -41,4 +37,5 @@ typedef struct Item {
   } data;
 } Item;
 
-Item create_item();
+Item *create_item(ItemKind kind, char *name, int health_bonus, int attack_bonus, int defense_bonus);
+void destroy_item(Item *item);
