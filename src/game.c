@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include "items.h"
+#include "inventory.h"
 #include "terminal.h"
 #include "game.h"
 #include "utils.h"
@@ -34,44 +35,6 @@ Player *create_player() {
 
   return player;
 };
-
-void add_item_to_player_inventory(Player *player, Item *item) {
-  if (player == NULL || item == NULL) {
-    return;
-  }
-
-  player->inventory[player->inventory_count-1] = item;
-  player->inventory_count++;
-}
-
-void remove_item_from_player_inventory(Player *player, Item *item) {
-  return;
-}
-
-void equip_item(Player *player, Item *item) {
-  if (player == NULL || item == NULL) {
-    return;
-  }
-
-  switch (item->kind) {
-    case WEAPON:
-      player->weapon = item;
-      break;
-    case SHIELD:
-      player->shield = item;
-      break;
-    case POTION:
-      break;
-    case ACCESSORY:
-      player->accessory = item;
-      break;
-  }
-  return;
-}
-
-void unequip_item(Player *player, Item *item) {
-  return;
-}
 
 void initialize_visited_rooms(Player *player) {
   player->visited_rooms = malloc(sizeof(VisitedRooms));
