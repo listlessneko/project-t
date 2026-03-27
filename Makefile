@@ -1,15 +1,23 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -g
+CFLAGS = -Wall -Wextra -g -Iinclude
 
-SRCS = $(wildcard *.c)
-OBJS = $(SRCS:.c=.o)
-TARGET = project-t
+SRC_DIR = src
+BUILD_DIR = build
+
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
+TARGET = $(BUILD_DIR)/project-t
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
 
-%.o: %.c
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -rf $(BUILD_DIR)
+
+.PHONY: clean
