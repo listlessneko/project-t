@@ -33,10 +33,6 @@ typedef struct Player {
 
 void start_game(Player *player);
 Player *create_player();
-void add_item_to_player_inventory(Player *player, Item *item);
-void remove_item_from_player_inventory(Player *player, Item *item);
-void equip_item(Player *player, Item *item);
-void unequip_item(Player *player, Item *item);
 void initialize_visited_rooms(Player *player);
 Enemy *create_enemy(char *name, int max_health, int attack, int defense);
 void destroy_enemy(Enemy *enemy);
