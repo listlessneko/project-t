@@ -21,8 +21,8 @@ Item *create_item(ItemKind kind, char *name, int health_bonus, int attack_bonus,
     case WEAPON:
       new_item->data.weapon.attack_bonus = attack_bonus;
       break;
-    case ARMOR:
-      new_item->data.armor.defense_bonus = defense_bonus;
+    case SHIELD:
+      new_item->data.shield.defense_bonus = defense_bonus;
       break;
     case ACCESSORY:
       new_item->data.accessory.attack_bonus = attack_bonus;
@@ -41,3 +41,4 @@ Item *create_item(ItemKind kind, char *name, int health_bonus, int attack_bonus,
 void destroy_item(Item *item) {
   free(item);
 }
+

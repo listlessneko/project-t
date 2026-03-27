@@ -1,9 +1,5 @@
 #pragma once
 
-// A way to track how many rooms have been generated so far
-// A function that generates a new room and returns a pointer to it
-// Logic in explore that checks if a direction exists, generates if not, then moves the player
-
 #define MAX_ROOMS 12
 #define MAX_SAFE_ROOMS 1
 #define MAX_EASY_ROOMS 3

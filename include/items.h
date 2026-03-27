@@ -1,8 +1,10 @@
 #pragma once
 
+#include "game.h"
+
 typedef enum {
   WEAPON,
-  ARMOR,
+  SHIELD,
   POTION,
   ACCESSORY
 } ItemKind;
@@ -11,9 +13,9 @@ typedef struct Weapon {
   int attack_bonus;
 } Weapon;
 
-typedef struct Armor {
+typedef struct Shield {
   int defense_bonus;
-} Armor;
+} Shield;
 
 typedef struct Potion {
   int health_bonus;
@@ -31,7 +33,7 @@ typedef struct Item {
   ItemKind kind;
   union {
     Weapon weapon;
-    Armor armor;
+    Shield shield;
     Potion potion;
     Accessory accessory;
   } data;
