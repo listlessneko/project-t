@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "items.h"
 #include "terminal.h"
 #include "game.h"
 #include "utils.h"
@@ -20,14 +21,66 @@ Player *create_player() {
   player->defense = 3;
   player->gold = 0;
   player->inventory_count = 0;
-  player->visited_rooms = malloc(sizeof(VisitedRooms));
-  if (player->visited_rooms == NULL) {
-    free(player);
-    return NULL;
-  }
-  player->visited_rooms->count = 0;
+
+  Item *player_weapon = create_item(WEAPON, "Sword", 0, 1, 0);
+  add_item_to_player_inventory(player, player_weapon);
+  equip_item(player, player_weapon);
+
+  Item *player_shield = create_item(SHIELD, "Shield", 0, 0, 1);
+  add_item_to_player_inventory(player, player_shield);
+  equip_item(player, player_shield);
+
+  initialize_visited_rooms(player);
+
   return player;
 };
+
+void add_item_to_player_inventory(Player *player, Item *item) {
+  if (player == NULL || item == NULL) {
+    return;
+  }
+
+  player->inventory[player->inventory_count-1] = item;
+  player->inventory_count++;
+}
+
+void remove_item_from_player_inventory(Player *player, Item *item) {
+  return;
+}
+
+void equip_item(Player *player, Item *item) {
+  if (player == NULL || item == NULL) {
+    return;
+  }
+
+  switch (item->kind) {
+    case WEAPON:
+      player->weapon = item;
+      break;
+    case SHIELD:
+      player->shield = item;
+      break;
+    case POTION:
+      break;
+    case ACCESSORY:
+      player->accessory = item;
+      break;
+  }
+  return;
+}
+
+void unequip_item(Player *player, Item *item) {
+  return;
+}
+
+void initialize_visited_rooms(Player *player) {
+  player->visited_rooms = malloc(sizeof(VisitedRooms));
+  if (player->visited_rooms == NULL) {
+    return;
+  }
+  player->visited_rooms->count = 0;
+  return;
+}
 
 Enemy *create_enemy(char *name, int max_health, int attack, int defense) {
   Enemy *enemy = malloc(sizeof(Enemy));
