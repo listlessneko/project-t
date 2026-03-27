@@ -1,0 +1,114 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/game.o",
+      "src/game.c"
+    ],
+    "directory": "/home/kedarui/workspace/project-t",
+    "file": "/home/kedarui/workspace/project-t/src/game.c",
+    "output": "/home/kedarui/workspace/project-t/build/game.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/inventory.o",
+      "src/inventory.c"
+    ],
+    "directory": "/home/kedarui/workspace/project-t",
+    "file": "/home/kedarui/workspace/project-t/src/inventory.c",
+    "output": "/home/kedarui/workspace/project-t/build/inventory.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/items.o",
+      "src/items.c"
+    ],
+    "directory": "/home/kedarui/workspace/project-t",
+    "file": "/home/kedarui/workspace/project-t/src/items.c",
+    "output": "/home/kedarui/workspace/project-t/build/items.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/main.o",
+      "src/main.c"
+    ],
+    "directory": "/home/kedarui/workspace/project-t",
+    "file": "/home/kedarui/workspace/project-t/src/main.c",
+    "output": "/home/kedarui/workspace/project-t/build/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/rooms.o",
+      "src/rooms.c"
+    ],
+    "directory": "/home/kedarui/workspace/project-t",
+    "file": "/home/kedarui/workspace/project-t/src/rooms.c",
+    "output": "/home/kedarui/workspace/project-t/build/rooms.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/terminal.o",
+      "src/terminal.c"
+    ],
+    "directory": "/home/kedarui/workspace/project-t",
+    "file": "/home/kedarui/workspace/project-t/src/terminal.c",
+    "output": "/home/kedarui/workspace/project-t/build/terminal.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/utils.o",
+      "src/utils.c"
+    ],
+    "directory": "/home/kedarui/workspace/project-t",
+    "file": "/home/kedarui/workspace/project-t/src/utils.c",
+    "output": "/home/kedarui/workspace/project-t/build/utils.o"
+  }
+]
