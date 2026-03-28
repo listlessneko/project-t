@@ -3,6 +3,8 @@
 #include <string.h>
 #include "items.h"
 
+static int item_id_counter = 0;
+
 Item *create_item(ItemKind kind, char *name, int health_bonus, int attack_bonus, int defense_bonus) {
   if (kind < 0 || kind > 3) {
     return NULL;
@@ -16,6 +18,7 @@ Item *create_item(ItemKind kind, char *name, int health_bonus, int attack_bonus,
 
   strcpy(new_item->name, name);
   new_item->kind = kind;
+  new_item->id = item_id_counter++;
 
   switch (kind) {
     case WEAPON:

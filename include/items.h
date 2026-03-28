@@ -31,6 +31,7 @@ typedef struct Accessory {
 typedef struct Item {
   char name[32];
   ItemKind kind;
+  int id;
   union {
     Weapon weapon;
     Shield shield;
