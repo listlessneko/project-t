@@ -18,7 +18,22 @@ int add_item_to_player_inventory(Player *player, Item *item) {
 }
 
 int remove_item_from_player_inventory(Player *player, Item *item) {
-  return ITEM_REMOVE_FROM_INVENTORY_INVALID;
+  if (player == NULL || item == NULL) {
+    return ITEM_REMOVE_FROM_INVENTORY_INVALID;
+  }
+
+  for (int i = 0; i < player->inventory_count; i++) {
+    if (player->inventory[i]->id == item->id) {
+      player->inventory[i] = player->inventory[player->inventory_count-1];
+      player->inventory[player->inventory_count-1] = NULL;
+      player->inventory_count--;
+
+      destroy_item(item);
+      return ITEM_REMOVE_FROM_INVENTORY_SUCCESS;
+    }
+  }
+
+  return ITEM_REMOVE_FROM_INVENTORY_ERROR;
 }
 
 int equip_item(Player *player, Item *item) {
