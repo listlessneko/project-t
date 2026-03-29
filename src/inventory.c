@@ -24,11 +24,12 @@ int remove_item_from_player_inventory(Player *player, Item *item) {
 
   for (int i = 0; i < player->inventory_count; i++) {
     if (player->inventory[i]->id == item->id) {
-      player->inventory[i] = player->inventory[player->inventory_count-1];
+      if (i != player->inventory_count-1) {
+        player->inventory[i] = player->inventory[player->inventory_count-1];
+      }
       player->inventory[player->inventory_count-1] = NULL;
       player->inventory_count--;
 
-      destroy_item(item);
       return ITEM_REMOVE_FROM_INVENTORY_SUCCESS;
     }
   }
