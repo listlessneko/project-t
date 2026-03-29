@@ -24,16 +24,17 @@ int drop_item(Player *player, Item *item, Room *room) {
 }
 
 int pick_up_item(Player *player, Item *item, Room *room) {
-  if (player == NULL || room == NULL) {
+  if (player == NULL || item == NULL || room == NULL) {
     return PICK_UP_ITEM_INVALID;
   }
 
-  int added_to_inventory = add_item_to_player_inventory(player, item);
-  if (added_to_inventory == INVENTORY_ITEMS_FULL) {
-    return PICK_UP_ITEM_FULL;
-  } else if (added_to_inventory == ITEM_ADD_TO_INVENTORY_SUCCESS) {
-    int removed_from_room = remove_item_from_room(room, item);
-    if (removed_from_room == ITEM_REMOVE_FROM_ROOM_SUCCESS) {
+  int removed_from_room = remove_item_from_room(room, item);
+  if (removed_from_room == ITEM_REMOVE_FROM_ROOM_SUCCESS) {
+    int added_to_inventory = add_item_to_player_inventory(player, item);
+    if (added_to_inventory == INVENTORY_ITEMS_FULL) {
+      add_item_to_room(room, item);
+      return PICK_UP_ITEM_FULL;
+    } else if (added_to_inventory == ITEM_ADD_TO_INVENTORY_SUCCESS) {
       return PICK_UP_ITEM_SUCCESS;
     }
   }
