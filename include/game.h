@@ -3,6 +3,10 @@
 #include "items.h"
 #include "rooms.h"
 
+typedef enum EntityResults {
+  ENTITY_INVALID
+} EntityResults;
+
 typedef struct Enemy {
   char name[32];
   int level;

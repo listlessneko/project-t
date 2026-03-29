@@ -152,7 +152,6 @@ int add_item_to_room(Room *room, Item *item) {
   return ITEM_ADD_TO_ROOM_SUCCESS;
 }
 
-
 void explore_room(Player *player, int choice) {
   Room **next = NULL;
   if (choice == 1) {
