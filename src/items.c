@@ -5,6 +5,21 @@
 
 static int item_id_counter = 0;
 
+const char *item_kind_name(ItemKind kind) {
+  switch(kind) {
+    case WEAPON:
+      return "Weapon";
+    case SHIELD:
+      return "Shield";
+    case POTION:
+      return "Potion";
+    case ACCESSORY:
+      return "Accessory";
+    default:
+      return "Unknown";
+  }
+}
+
 Item *create_item(ItemKind kind, char *name, int health_bonus, int attack_bonus, int defense_bonus) {
   if (kind < 0 || kind > 3) {
     return NULL;
