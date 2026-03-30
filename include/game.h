@@ -3,20 +3,6 @@
 #include "items.h"
 #include "rooms.h"
 
-typedef enum EntityKind {
-  PLAYER,
-  ENEMY,
-  ITEM,
-  ROOM,
-  UNKNOWN,
-} EntityKind;
-
-typedef enum EnemyKind {
-  ENEMY_EASY,
-  ENEMY_NORMAL,
-  ENEMY_HARD,
-} EnemyKind;
-
 typedef struct Enemy {
   EntityKind entity_kind;
   EnemyKind enemy_kind;
@@ -29,10 +15,6 @@ typedef struct Enemy {
   int attack;
   int defense;
 } Enemy;
-
-typedef enum PlayerKind {
-  ADVENTURER,
-} PlayerKind;
 
 typedef struct Player {
   EntityKind entity_kind;

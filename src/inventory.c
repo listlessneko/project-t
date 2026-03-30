@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include "entities.h"
+#include "status.h"
 #include "game.h"
 #include "items.h"
 #include "inventory.h"
@@ -42,7 +44,7 @@ int equip_item(Player *player, Item *item) {
     return ITEM_EQUIP_INVALID;
   }
 
-  switch (item->kind) {
+  switch (item->item_kind) {
     case WEAPON:
       if (player->weapon == NULL) {
         player->weapon = item;
@@ -71,7 +73,7 @@ int use_item(Player *player, Item *item) {
     return ITEM_USE_ERROR;
   }
 
-  switch (item->kind) {
+  switch (item->item_kind) {
     case WEAPON:
     case SHIELD:
       return ITEM_USE_INVALID;

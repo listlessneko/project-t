@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include "entities.h"
+#include "status.h"
 #include "items.h"
 
 static int item_id_counter = 0;
@@ -31,8 +33,9 @@ Item *create_item(ItemKind kind, char *name, int health_bonus, int attack_bonus,
     return NULL;
   }
 
+  new_item->entity_kind = ENTITY_ITEM;
+  new_item->item_kind = kind;
   strcpy(new_item->name, name);
-  new_item->kind = kind;
   new_item->id = item_id_counter++;
 
   switch (kind) {
