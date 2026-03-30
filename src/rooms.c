@@ -4,7 +4,6 @@
 #include "game.h"
 #include "rooms.h"
 #include "items.h"
-#include "terminal.h"
 #include "utils.h"
 
 char *directions[] = { "north", "east", "west", "south" };
@@ -300,28 +299,5 @@ Room *generate_room(Player *player, int choice) {
   new_room->id = player->visited_rooms->count;
   new_room->visited = 0;
   return new_room;
-}
-
-int explore(Player *player) {
-  print_text(PRINT_FAST3,
-             "[1] Go north\n"
-             "[2] Go east\n"
-             "[3] Go west\n"
-             "[4] Go south\n"
-             );
-
-  char choice[32];
-  read_input(choice, sizeof(choice));
-
-  int choice_int = atoi(choice);
-  if (choice_int >= 1 && choice_int <= 4) {
-    explore_room(player, choice_int);
-  } else if (strcmp(choice, "quit") == 0) {
-    print_text(PRINT_NORMAL5, "You open your eyes and realize it was just a dream.\n");
-    return 1;
-  } else {
-    print_text(PRINT_NORMAL5, "You stare off into the distance...\n");
-  }
-  return 0;
 }
 

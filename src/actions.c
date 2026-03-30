@@ -1,9 +1,47 @@
 #include <stdlib.h>
+#include <string.h>
 #include "actions.h"
 #include "game.h"
 #include "inventory.h"
 #include "items.h"
 #include "rooms.h"
+#include "utils.h"
+#include "terminal.h"
+
+ParsedCommand parse_input(const char *input) {
+  ParsedCommand output = {
+    .kind = CMD_KIND_UNKNOWN,
+    .target = ""
+  };
+
+  if (input == NULL) {
+    return output;
+  }
+
+}
+
+int explore(Player *player) {
+  print_text(PRINT_FAST3,
+             "[1] Go north\n"
+             "[2] Go east\n"
+             "[3] Go west\n"
+             "[4] Go south\n"
+             );
+
+  char choice[32];
+  read_input(choice, sizeof(choice));
+
+  int choice_int = atoi(choice);
+  if (choice_int >= 1 && choice_int <= 4) {
+    explore_room(player, choice_int);
+  } else if (strcmp(choice, "quit") == 0) {
+    print_text(PRINT_NORMAL5, "You open your eyes and realize it was just a dream.\n");
+    return 1;
+  } else {
+    print_text(PRINT_NORMAL5, "You stare off into the distance...\n");
+  }
+  return 0;
+}
 
 int drop_item(Player *player, Item *item, Room *room) {
   if (player == NULL || item == NULL || room == NULL) {

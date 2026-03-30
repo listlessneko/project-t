@@ -71,7 +71,6 @@ typedef struct VisitedRooms {
 
 extern char *directions[];
 
-int explore(Player *player);
 void explore_room(Player *player, int choice);
 Room *generate_room(Player *player, int choice);
 int add_item_to_room(Room *room, Item *item);
