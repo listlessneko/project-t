@@ -74,9 +74,11 @@ typedef struct Accessory {
 } Accessory;
 
 typedef struct Item {
-  char name[32];
-  ItemKind kind;
+  EntityKind enemy_kind;
+  ItemKind item_kind;
   int id;
+  char name[32];
+  char description[256];
   union {
     Weapon weapon;
     Shield shield;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game.h"
 #define MAX_ROOMS 12
 #define MAX_SAFE_ROOMS 1
 #define MAX_EASY_ROOMS 3
@@ -33,10 +34,11 @@ typedef struct Enemy Enemy;
 typedef struct Item Item;
 
 typedef struct Room {
+  EntityKind entity_kind;
+  RoomKind room_kind;
+  int id;
   char name[50];
   char description[256];
-  int id;
-  RoomKind kind;
   struct Room *north;
   struct Room *east;
   struct Room *west;
