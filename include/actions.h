@@ -1,5 +1,4 @@
-#include "game.h"
-#include "rooms.h"
+#include "entities.h"
 
 #define CMD_PICK_UP "pick up"
 #define CMD_DROP "drop"

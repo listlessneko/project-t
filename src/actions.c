@@ -1,12 +1,14 @@
 #include <stdlib.h>
 #include <string.h>
+#include "entities.h"
+#include "status.h"
 #include "actions.h"
 #include "game.h"
 #include "inventory.h"
 #include "items.h"
 #include "rooms.h"
-#include "utils.h"
 #include "terminal.h"
+#include "utils.h"
 
 ParsedCommand parse_input(const char *input) {
   ParsedCommand output = {
@@ -17,7 +19,7 @@ ParsedCommand parse_input(const char *input) {
   if (input == NULL) {
     return output;
   }
-
+  return output;
 }
 
 int explore(Player *player) {
