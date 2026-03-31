@@ -37,3 +37,10 @@ typedef struct Player Player;
 typedef struct Enemy Enemy;
 typedef struct Item Item;
 typedef struct Room Room;
+
+typedef struct BaseEntity {
+  EntityKind entity_kind;
+  int id;
+  char *name[32];
+  char *description[256];
+} BaseEntity;

@@ -22,6 +22,14 @@ typedef struct ParsedCommand {
   char target[32];
 } ParsedCommand;
 
+typedef struct MenuOptions {
+  CommandKind command_kind;
+  int count;
+  void *data[];
+} MenuOptions;
+
+MenuOptions *parse_menu_input(Player *player, CommandKind command);
+void display_menu(MenuOptions *options);
 ParsedCommand parse_input(const char *input);
 int explore(Player *player);
 int drop_item(Player *player, Item *item, Room *room);
