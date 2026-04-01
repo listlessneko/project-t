@@ -24,6 +24,7 @@ typedef struct ParsedCommand {
 
 typedef struct MenuOptions {
   CommandKind command_kind;
+  EntityKind entity_kind;
   int count;
   void *data[];
 } MenuOptions;
