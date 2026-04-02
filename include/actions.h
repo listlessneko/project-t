@@ -29,7 +29,7 @@ typedef struct MenuOptions {
   void *data[];
 } MenuOptions;
 
-MenuOptions *parse_menu_input(Player *player, CommandKind command);
+MenuOptions *parse_menu_input(Player *player, CommandKind command, EntityKind entity_kind);
 void display_menu(MenuOptions *options);
 ParsedCommand parse_input(const char *input);
 int explore(Player *player);
