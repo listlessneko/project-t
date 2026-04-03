@@ -152,6 +152,24 @@ int add_item_to_room(Room *room, Item *item) {
   return ITEM_ADD_TO_ROOM_SUCCESS;
 }
 
+int remove_item_from_room(Room *room, Item *item) {
+  if (room == NULL || item == NULL) {
+    return ITEM_REMOVE_FROM_ROOM_INVALID;
+  }
+
+  for (int i = 0; i < room->items_count; i++) {
+    if (room->items[i]->id == item->id) {
+      if (i != room->items_count-1) {
+        room->items[i] = room->items[room->items_count-1];
+      }
+      room->items[room->items_count-1] = NULL;
+      room->items_count--;
+      return ITEM_REMOVE_FROM_ROOM_SUCCESS;
+    }
+  }
+  return ITEM_REMOVE_FROM_ROOM_ERROR;
+}
+
 void explore_room(Player *player, int choice) {
   Room **next = NULL;
   if (choice == 1) {

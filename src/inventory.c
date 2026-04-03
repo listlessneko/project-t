@@ -31,11 +31,9 @@ int remove_item_from_player_inventory(Player *player, Item *item) {
       }
       player->inventory[player->inventory_count-1] = NULL;
       player->inventory_count--;
-
       return ITEM_REMOVE_FROM_INVENTORY_SUCCESS;
     }
   }
-
   return ITEM_REMOVE_FROM_INVENTORY_ERROR;
 }
 
