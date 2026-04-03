@@ -1,7 +1,7 @@
 #pragma once
 
-#include "items.h"
-#include "rooms.h"
+#include "item.h"
+#include "area.h"
 
 typedef struct Enemy {
   EntityKind entity_kind;
@@ -34,14 +34,14 @@ typedef struct Player {
   Item *accessory;
   Item *inventory[12];
   int inventory_count;
-  Room *current_room;
-  VisitedRooms *visited_rooms;
+  Area *current_area;
+  VisitedAreas *visited_areas;
 } Player;
 
 
 void start_game(Player *player);
 Player *create_player();
-void initialize_visited_rooms(Player *player);
+void initialize_visited_areas(Player *player);
 Enemy *create_enemy(char *name, int max_health, int attack, int defense);
 void destroy_enemy(Enemy *enemy);
 void game_loop(Player *player);

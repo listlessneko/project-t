@@ -4,7 +4,7 @@ typedef enum EntityKind {
   ENTITY_PLAYER,
   ENTITY_ENEMY,
   ENTITY_ITEM,
-  ENTITY_ROOM,
+  ENTITY_AREA,
   ENTITY_UNKNOWN,
 } EntityKind;
 
@@ -26,17 +26,17 @@ typedef enum ItemKind {
   ITEM_ACCESSORY
 } ItemKind;
 
-typedef enum RoomKind {
-  ROOM_SAFE,
-  ROOM_EASY,
-  ROOM_NORMAL,
-  ROOM_HARD,
-} RoomKind;
+typedef enum AreaKind {
+  AREA_SAFE,
+  AREA_EASY,
+  AREA_NORMAL,
+  AREA_HARD,
+} AreaKind;
 
 typedef struct Player Player;
 typedef struct Enemy Enemy;
 typedef struct Item Item;
-typedef struct Room Room;
+typedef struct Area Area;
 
 typedef struct BaseEntity {
   EntityKind entity_kind;

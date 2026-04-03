@@ -3,7 +3,7 @@
 #include <string.h>
 #include "entities.h"
 #include "status.h"
-#include "items.h"
+#include "item.h"
 
 static int item_id_counter = 0;
 

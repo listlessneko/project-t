@@ -1,5 +1,4 @@
 #include "game.h"
-#include "rooms.h"
 #include "terminal.h"
 
 int main(void) {

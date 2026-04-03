@@ -2,7 +2,7 @@
 #include "entities.h"
 #include "status.h"
 #include "game.h"
-#include "items.h"
+#include "item.h"
 #include "inventory.h"
 
 void view_inventory(Player *player) {

@@ -1,13 +1,12 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "items.h"
+#include "game.h"
+#include "area.h"
+#include "item.h"
 #include "inventory.h"
 #include "terminal.h"
-#include "game.h"
 #include "utils.h"
-#include "rooms.h"
 
 Player *create_player() {
   Player *player = malloc(sizeof(Player));
@@ -23,25 +22,25 @@ Player *create_player() {
   player->gold = 0;
   player->inventory_count = 0;
 
-  Item *player_weapon = create_item(WEAPON, "Sword", 0, 1, 0);
+  Item *player_weapon = create_item(ITEM_WEAPON, "Sword", 0, 1, 0);
   add_item_to_player_inventory(player, player_weapon);
   equip_item(player, player_weapon);
 
-  Item *player_shield = create_item(SHIELD, "Shield", 0, 0, 1);
+  Item *player_shield = create_item(ITEM_SHIELD, "Shield", 0, 0, 1);
   add_item_to_player_inventory(player, player_shield);
   equip_item(player, player_shield);
 
-  initialize_visited_rooms(player);
+  initialize_visited_areas(player);
 
   return player;
 };
 
-void initialize_visited_rooms(Player *player) {
-  player->visited_rooms = malloc(sizeof(VisitedRooms));
-  if (player->visited_rooms == NULL) {
+void initialize_visited_areas(Player *player) {
+  player->visited_areas = malloc(sizeof(VisitedAreas));
+  if (player->visited_areas == NULL) {
     return;
   }
-  player->visited_rooms->count = 0;
+  player->visited_areas->count = 0;
   return;
 }
 
@@ -74,12 +73,12 @@ void start_game(Player *player) {
   print_text(PRINT_NORMAL5, "You've been resting your strained back against a large tree while letting your mind wander off.\n");
   print_text(PRINT_NORMAL5, "The breaking sound of a distant tree branch snaps you back to reality.\n");
   print_text(PRINT_NORMAL5, "You have to keep moving before the sun sets.\n");
-  player->current_room = NULL;
-  player->current_room = generate_room(player, -1);
-  player->visited_rooms->visited[0] = player->current_room;
-  player->visited_rooms->count = 1;
-  print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);
-  print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
+  player->current_area = NULL;
+  player->current_area = generate_area(player, -1);
+  player->visited_areas->visited[0] = player->current_area;
+  player->visited_areas->count = 1;
+  print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_area->name);
+  print_text(PRINT_NORMAL5, "%s\n", player->current_area->description);
 }
 
 void game_loop(Player *player) {

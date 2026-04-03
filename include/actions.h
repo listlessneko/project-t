@@ -29,9 +29,9 @@ typedef struct MenuOptions {
   void *data[];
 } MenuOptions;
 
-MenuOptions *parse_menu_input(Player *player, CommandKind command, EntityKind entity_kind);
+MenuOptions *parse_menu_input(Player *player, CommandKind command, EntityKind target_entity_kind, EntityKind from_entity_kind);
 void display_menu(MenuOptions *options);
 ParsedCommand parse_input(const char *input);
 int explore(Player *player);
-int drop_item(Player *player, Item *item, Room *room);
-int pick_up_item(Player *player, Item *item, Room *room);
+int drop_item(Player *player, Item *item, Area *area);
+int pick_up_item(Player *player, Item *item, Area *area);
