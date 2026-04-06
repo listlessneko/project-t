@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include "entities.h"
+#include "status.h"
 #include "game.h"
 #include "items.h"
 #include "inventory.h"
@@ -43,19 +45,19 @@ int equip_item(Player *player, Item *item) {
   }
 
   switch (item->kind) {
-    case WEAPON:
+    case ITEM_WEAPON:
       if (player->weapon == NULL) {
         player->weapon = item;
         return ITEM_EQUIP_SUCCESS;
       } else {
         return ITEM_SLOT_ALREADY_EQUIPPED;
       }
-    case SHIELD:
+    case ITEM_SHIELD:
       player->shield = item;
       return ITEM_EQUIP_SUCCESS;
-    case POTION:
+    case ITEM_POTION:
       return ITEM_EQUIP_INVALID;
-    case ACCESSORY:
+    case ITEM_ACCESSORY:
       player->accessory = item;
       return ITEM_EQUIP_SUCCESS;
   }
@@ -72,10 +74,10 @@ int use_item(Player *player, Item *item) {
   }
 
   switch (item->kind) {
-    case WEAPON:
-    case SHIELD:
+    case ITEM_WEAPON:
+    case ITEM_SHIELD:
       return ITEM_USE_INVALID;
-    case POTION: {
+    case ITEM_POTION: {
       int health_regained = player->health + item->data.potion.health_bonus;
       int max_health = player->max_health;
       player->health = health_regained > max_health ? max_health : health_regained;
@@ -86,7 +88,7 @@ int use_item(Player *player, Item *item) {
       destroy_item(item);
       return ITEM_USE_SUCCESS;
     }
-    case ACCESSORY:
+    case ITEM_ACCESSORY:
       return ITEM_USE_INVALID;
     default:
       return ITEM_USE_INVALID;
