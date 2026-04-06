@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include "entities.h"
+#include "status.h"
 #include "actions.h"
 #include "game.h"
 #include "inventory.h"
