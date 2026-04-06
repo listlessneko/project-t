@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+#include "entities.h"
+#include "status.h"
 #include "game.h"
 #include "rooms.h"
 #include "items.h"
@@ -20,7 +21,7 @@ RoomAppearanceTemplate safe_room_appearance_templates[] = {
   {
     .name = "Grove",
     .description = "This is a grove...",
-    .kind = SAFE
+    .kind = ROOM_SAFE
   }
 };
 
@@ -28,17 +29,17 @@ RoomAppearanceTemplate easy_room_appearance_templates[] = {
   {
     .name = "Glade",
     .description = "This is a glade...",
-    .kind = EASY
+    .kind = ROOM_EASY
   },
   {
     .name = "Clearing",
     .description = "This is a clearing...",
-    .kind = EASY
+    .kind = ROOM_EASY
   },
   {
     .name = "Hollow",
     .description = "This is a hollow...",
-    .kind = EASY
+    .kind = ROOM_EASY
   },
 };
 
@@ -46,27 +47,27 @@ RoomAppearanceTemplate normal_room_appearance_templates[] = {
   {
     .name = "Ridge",
     .description = "This is a ridge...",
-    .kind = NORMAL
+    .kind = ROOM_NORMAL
   },
   {
     .name = "Creek Bed",
     .description = "This is a creek bed...",
-    .kind = NORMAL
+    .kind = ROOM_NORMAL
   },
   {
     .name = "Undergrowth",
     .description = "This is an undergrowth...",
-    .kind = NORMAL
+    .kind = ROOM_NORMAL
   },
   {
     .name = "Fork",
     .description = "This is a Fork...",
-    .kind = NORMAL
+    .kind = ROOM_NORMAL
   },
   {
     .name = "Abandoned Camp",
     .description = "This is an Abandoned Camp...",
-    .kind = NORMAL
+    .kind = ROOM_NORMAL
   },
 };
 
@@ -74,17 +75,17 @@ RoomAppearanceTemplate hard_room_appearance_templates[] = {
   {
     .name = "Main Road",
     .description = "This is Main Road...",
-    .kind = HARD
+    .kind = ROOM_HARD
   },
   {
     .name = "Wens Pass",
     .description = "This is Wens Pass...",
-    .kind = HARD
+    .kind = ROOM_HARD
   },
   {
     .name = "Wens Village",
     .description = "This is Wens Village...",
-    .kind = HARD
+    .kind = ROOM_HARD
   },
 };
 
@@ -96,7 +97,7 @@ RoomContentsTemplate safe_room_contents_templates[] = {
     .enemy_min_attack = -1,
     .enemy_max_defense = -1,
     .enemy_min_defense = -1,
-    .kind = SAFE
+    .kind = ROOM_SAFE
   }
 };
 
@@ -109,7 +110,7 @@ RoomContentsTemplate easy_room_contents_templates[] = {
     .enemy_min_attack = 1,
     .enemy_max_defense = 2,
     .enemy_min_defense = 1,
-    .kind = EASY
+    .kind = ROOM_EASY
   }
 };
 
@@ -122,7 +123,7 @@ RoomContentsTemplate normal_room_contents_templates[] = {
     .enemy_min_attack = 2,
     .enemy_max_defense = 4,
     .enemy_min_defense = 2,
-    .kind = NORMAL
+    .kind = ROOM_NORMAL
   }
 };
 
@@ -135,7 +136,7 @@ RoomContentsTemplate hard_room_contents_templates[] = {
     .enemy_min_attack = 5,
     .enemy_max_defense = 8,
     .enemy_min_defense = 5,
-    .kind = HARD
+    .kind = ROOM_HARD
   }
 };
 
@@ -177,7 +178,7 @@ void explore_room(Player *player, int choice) {
   } else {
     player->current_room = *next;
   }
-  if (player->current_room->kind == SAFE) {
+  if (player->current_room->kind == ROOM_SAFE) {
     print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);
     print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
   } else {
@@ -195,7 +196,7 @@ Room *generate_room(Player *player, int choice) {
     if (new_room == NULL) {
       return NULL;
     }
-    new_room->kind = SAFE;
+    new_room->kind = ROOM_SAFE;
     room_kind_counter.safe++;
     strcpy(new_room->name, safe_room_appearance_templates[0].name);
     strcpy(new_room->description, safe_room_appearance_templates[0].description);
@@ -211,39 +212,43 @@ Room *generate_room(Player *player, int choice) {
     int max_room_kind = 0;
     int room_kind_count = 0;
     switch (current_room_kind) {
-      case SAFE:
+      case ROOM_SAFE:
         max_room_kind = MAX_SAFE_ROOMS;
         room_kind_count = room_kind_counter.safe;
         break;
-      case EASY:
+      case ROOM_EASY:
         max_room_kind = MAX_EASY_ROOMS;
         room_kind_count = room_kind_counter.easy;
         break;
-      case NORMAL:
+      case ROOM_NORMAL:
         max_room_kind = MAX_NORMAL_ROOMS;
         room_kind_count = room_kind_counter.normal;
         break;
-      case HARD:
+      case ROOM_HARD:
         max_room_kind = MAX_HARD_ROOMS;
         room_kind_count = room_kind_counter.hard;
         break;
+      case ROOM_UNKNOWN:
+        return NULL;
     }
 
     if (room_kind_count >= max_room_kind) {
       current_room_kind = (RoomKind)(current_room_kind + 1);
       switch (current_room_kind) {
-        case SAFE:
+        case ROOM_SAFE:
           max_room_kind = MAX_SAFE_ROOMS;
           break;
-        case EASY:
+        case ROOM_EASY:
           max_room_kind = MAX_EASY_ROOMS;
           break;
-        case NORMAL:
+        case ROOM_NORMAL:
           max_room_kind = MAX_NORMAL_ROOMS;
           break;
-        case HARD:
+        case ROOM_HARD:
           max_room_kind = MAX_HARD_ROOMS;
           break;
+        case ROOM_UNKNOWN:
+          return NULL;
       }
     }
 
@@ -257,26 +262,28 @@ Room *generate_room(Player *player, int choice) {
     RoomAppearanceTemplate fateful_room_appearance;
     RoomContentsTemplate fateful_room_contents;
     switch (new_room->kind) {
-      case SAFE:
+      case ROOM_SAFE:
         room_kind_counter.safe++;
         fateful_room_appearance = safe_room_appearance_templates[appearance_index];
         fateful_room_contents = safe_room_contents_templates[0];
         break;
-      case EASY:
+      case ROOM_EASY:
         room_kind_counter.easy++;
         fateful_room_appearance = easy_room_appearance_templates[appearance_index];
         fateful_room_contents = easy_room_contents_templates[0];
         break;
-      case NORMAL:
+      case ROOM_NORMAL:
         room_kind_counter.normal++;
         fateful_room_appearance = normal_room_appearance_templates[appearance_index];
         fateful_room_contents = normal_room_contents_templates[0];
         break;
-      case HARD:
+      case ROOM_HARD:
         room_kind_counter.hard++;
         fateful_room_appearance = hard_room_appearance_templates[room_kind_counter.hard - 1];
         fateful_room_contents = hard_room_contents_templates[0];
-
+        break;
+      case ROOM_UNKNOWN:
+        return NULL;
     }
 
     strcpy(new_room->name, fateful_room_appearance.name);
