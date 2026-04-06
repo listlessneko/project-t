@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "game.h"
 #include "rooms.h"
+#include "items.h"
 #include "terminal.h"
 #include "utils.h"
 
@@ -95,7 +96,6 @@ RoomContentsTemplate safe_room_contents_templates[] = {
     .enemy_min_attack = -1,
     .enemy_max_defense = -1,
     .enemy_min_defense = -1,
-    .items = NULL,
     .kind = SAFE
   }
 };
@@ -109,7 +109,6 @@ RoomContentsTemplate easy_room_contents_templates[] = {
     .enemy_min_attack = 1,
     .enemy_max_defense = 2,
     .enemy_min_defense = 1,
-    .items = NULL,
     .kind = EASY
   }
 };
@@ -123,7 +122,6 @@ RoomContentsTemplate normal_room_contents_templates[] = {
     .enemy_min_attack = 2,
     .enemy_max_defense = 4,
     .enemy_min_defense = 2,
-    .items = NULL,
     .kind = NORMAL
   }
 };
@@ -137,11 +135,22 @@ RoomContentsTemplate hard_room_contents_templates[] = {
     .enemy_min_attack = 5,
     .enemy_max_defense = 8,
     .enemy_min_defense = 5,
-    .items = NULL,
     .kind = HARD
   }
 };
 
+int add_item_to_room(Room *room, Item *item) {
+  if (room == NULL || item == NULL) {
+    return ITEM_ADD_TO_ROOM_INVALID;
+  }
+
+  if (room->items_count >= MAX_ROOM_ITEMS) {
+    return ROOM_ITEMS_FULL;
+  }
+  room->items[room->items_count] = item;
+  room->items_count++;
+  return ITEM_ADD_TO_ROOM_SUCCESS;
+}
 
 void explore_room(Player *player, int choice) {
   Room **next = NULL;

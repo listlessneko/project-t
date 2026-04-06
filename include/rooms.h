@@ -5,6 +5,7 @@
 #define MAX_EASY_ROOMS 3
 #define MAX_NORMAL_ROOMS 5
 #define MAX_HARD_ROOMS 3
+#define MAX_ROOM_ITEMS 3
 
 typedef enum RoomKind {
   SAFE,
@@ -41,7 +42,8 @@ typedef struct Room {
   struct Room *west;
   struct Room *south;
   Enemy *enemy;
-  Item *items;
+  Item *items[MAX_ROOM_ITEMS];
+  int items_count;
   int visited;
 } Room;
 
@@ -53,14 +55,13 @@ typedef struct RoomAppearanceTemplate {
 
 typedef struct RoomContentsTemplate {
   char *enemy_name;
+  RoomKind kind;
   int enemy_max_health;
   int enemy_min_health;
   int enemy_max_attack;
   int enemy_min_attack;
   int enemy_max_defense;
   int enemy_min_defense;
-  Item *items;
-  RoomKind kind;
 } RoomContentsTemplate;
 
 typedef struct VisitedRooms {
@@ -73,4 +74,6 @@ extern char *directions[];
 int explore(Player *player);
 void explore_room(Player *player, int choice);
 Room *generate_room(Player *player, int choice);
+int add_item_to_room(Room *room, Item *item);
+int remove_item_from_room(Room *room, Item *item);
 void view_map(Player *player);
