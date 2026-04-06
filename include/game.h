@@ -1,14 +1,13 @@
 #pragma once
 
-#include "items.h"
+#include "entities.h"
 #include "rooms.h"
 
-typedef enum EntityResults {
-  ENTITY_INVALID
-} EntityResults;
-
 typedef struct Enemy {
+  EntityKind entity_kind;
+  int id;
   char name[32];
+  char description[256];
   int level;
   int health;
   int max_health;
@@ -17,7 +16,10 @@ typedef struct Enemy {
 } Enemy;
 
 typedef struct Player {
+  EntityKind entity_kind;
+  int id;
   char name[32];
+  char description[256];
   int level;
   int exp;
   int health;

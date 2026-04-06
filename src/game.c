@@ -23,11 +23,11 @@ Player *create_player() {
   player->gold = 0;
   player->inventory_count = 0;
 
-  Item *player_weapon = create_item(WEAPON, "Sword", 0, 1, 0);
+  Item *player_weapon = create_item(ITEM_WEAPON, "Sword", 0, 1, 0);
   add_item_to_player_inventory(player, player_weapon);
   equip_item(player, player_weapon);
 
-  Item *player_shield = create_item(SHIELD, "Shield", 0, 0, 1);
+  Item *player_shield = create_item(ITEM_SHIELD, "Shield", 0, 0, 1);
   add_item_to_player_inventory(player, player_shield);
   equip_item(player, player_shield);
 

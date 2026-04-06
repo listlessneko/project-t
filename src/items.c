@@ -7,13 +7,13 @@ static int item_id_counter = 0;
 
 const char *item_kind_name(ItemKind kind) {
   switch(kind) {
-    case WEAPON:
+    case ITEM_WEAPON:
       return "Weapon";
-    case SHIELD:
+    case ITEM_SHIELD:
       return "Shield";
-    case POTION:
+    case ITEM_POTION:
       return "Potion";
-    case ACCESSORY:
+    case ITEM_ACCESSORY:
       return "Accessory";
     default:
       return "Unknown";
@@ -36,17 +36,17 @@ Item *create_item(ItemKind kind, char *name, int health_bonus, int attack_bonus,
   new_item->id = item_id_counter++;
 
   switch (kind) {
-    case WEAPON:
+    case ITEM_WEAPON:
       new_item->data.weapon.attack_bonus = attack_bonus;
       break;
-    case SHIELD:
+    case ITEM_SHIELD:
       new_item->data.shield.defense_bonus = defense_bonus;
       break;
-    case ACCESSORY:
+    case ITEM_ACCESSORY:
       new_item->data.accessory.attack_bonus = attack_bonus;
       new_item->data.accessory.defense_bonus = defense_bonus;
       break;
-    case POTION:
+    case ITEM_POTION:
       new_item->data.potion.health_bonus = health_bonus;
       new_item->data.potion.attack_bonus = attack_bonus;
       new_item->data.potion.defense_bonus = defense_bonus;

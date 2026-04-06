@@ -1,18 +1,13 @@
 #pragma once
 
+#include "entities.h"
+
 #define MAX_ROOMS 12
 #define MAX_SAFE_ROOMS 1
 #define MAX_EASY_ROOMS 3
 #define MAX_NORMAL_ROOMS 5
 #define MAX_HARD_ROOMS 3
 #define MAX_ROOM_ITEMS 3
-
-typedef enum RoomKind {
-  SAFE,
-  EASY,
-  NORMAL,
-  HARD,
-} RoomKind;
 
 typedef struct RoomKindCounter {
   int safe;
@@ -33,9 +28,10 @@ typedef struct Enemy Enemy;
 typedef struct Item Item;
 
 typedef struct Room {
-  char name[50];
-  char description[256];
+  EntityKind entity_kind;
   int id;
+  char name[32];
+  char description[256];
   RoomKind kind;
   struct Room *north;
   struct Room *east;
