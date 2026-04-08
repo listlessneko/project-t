@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "menu.h"
 #include "entities.h"
 #include "game.h"
@@ -35,6 +36,30 @@ BaseAction quit_option = {
   .action_kind = ACTION_QUIT,
   .name = { "Quit" },
   .description = { "Return to reality." },
+};
+
+BaseRoom north_room = {
+  .entity_kind = ENTITY_ROOM,
+  .name = { "north" },
+  .description = { "Explore north." },
+};
+
+BaseRoom east_room = {
+  .entity_kind = ENTITY_ROOM,
+  .name = { "east" },
+  .description = { "Explore east." },
+};
+
+BaseRoom west_room = {
+  .entity_kind = ENTITY_ROOM,
+  .name = { "west" },
+  .description = { "Explore west." },
+};
+
+BaseRoom south_room = {
+  .entity_kind = ENTITY_ROOM,
+  .name = { "south" },
+  .description = { "Explore south." },
 };
 
 MenuNode explore_node = {
@@ -85,7 +110,10 @@ MenuNode *build_menu_node(MenuNodeKind menu_node_kind, void *data) {
 
   switch (menu_node_kind) {
     case MENU_NODE_EXPLORE: {
-      menu_node->data.room = data;
+      BaseRoom *base_room = data;
+      strncpy(menu_node->name, base_room->name, sizeof(menu_node->name));
+      strncpy(menu_node->description, base_room->description, sizeof(menu_node->description));
+      menu_node->data.room = base_room->room;
       break;
     }
     case MENU_NODE_EXAMINE_ROOM:
@@ -117,8 +145,6 @@ void display_menu(Menu *menu) {
   print_text(PRINT_NORMAL5, "%s\n", menu->name);
   print_text(PRINT_NORMAL5, "%s\n", menu->description);
 
-  MenuKind menu_kind = menu->menu_kind;
-
   for (int i = 0; i < menu->count; i++) {
     MenuNode *menu_node = menu->options[i];
     MenuNodeKind menu_node_kind = menu_node->menu_node_kind;
@@ -128,16 +154,20 @@ void display_menu(Menu *menu) {
         print_text(PRINT_FAST3, "[%d] %s\n", i, menu_node->data.base_menu->name);
         break;
       case MENU_NODE_EXPLORE:
-        print_text(PRINT_FAST3, "[%d] %s\n", i, menu_node->data.room->name);
+        if (menu_node->data.room != NULL) {
+          print_text(PRINT_FAST3, "[%d] Go %s (%s)\n", i, menu_node->name, menu_node->data.room->name);
+        } else {
+          print_text(PRINT_FAST3, "[%d] Go %s \n", i, menu_node->name);
+        }
         break;
       case MENU_NODE_EXAMINE:
-        print_text(PRINT_FAST3, "[%d] %s\n", i, menu_node->data.base_menu->name);
+        print_text(PRINT_FAST3, "[%d] Examine %s\n", i, menu_node->data.base_menu->name);
         break;
       case MENU_NODE_EXAMINE_ROOM:
-        print_text(PRINT_FAST3, "[%d] %s\n", i, menu_node->data.item->name);
+        print_text(PRINT_FAST3, "[%d] Examine %s\n", i, menu_node->data.item->name);
         break;
       case MENU_NODE_EXAMINE_INVENTORY:
-        print_text(PRINT_FAST3, "[%d] %s\n", i, menu_node->data.item->name);
+        print_text(PRINT_FAST3, "[%d] Examine %s\n", i, menu_node->data.item->name);
         break;
       case MENU_NODE_QUIT:
         print_text(PRINT_FAST3, "[%d] %s\n", i, menu_node->data.base_action->name);
@@ -159,10 +189,16 @@ Menu *parse_player_choice(Player *player, Menu *menu, char *choice) {
     case MENU_NODE_EXPLORE: {
       menu_realloc(menu, 5);
       int i = -1;
-      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, player->current_room->north);
-      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, player->current_room->east);
-      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, player->current_room->west);
-      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, player->current_room->south);
+      Room *current_room = player->current_room;
+      north_room.room = current_room->north;
+      east_room.room = current_room->east;
+      west_room.room = current_room->west;
+      south_room.room = current_room->south;
+
+      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &north_room);
+      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &east_room);
+      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &west_room);
+      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &south_room);
       menu->options[i++] = build_menu_node(MENU_NODE_BACK, &back_node);
     }
 
