@@ -41,8 +41,17 @@ typedef struct BaseAction {
   char description[256];
 } BaseAction;
 
+typedef struct BaseRoom {
+  EntityKind entity_kind;
+  char name[32];
+  char description[256];
+  Room *room;
+} BaseRoom;
+
 typedef struct MenuNode {
   MenuNodeKind menu_node_kind;
+  char name[32];
+  char description[256];
   union {
     BaseMenu *base_menu;
     BaseAction *base_action;

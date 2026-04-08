@@ -44,6 +44,6 @@ typedef enum ItemKind {
 typedef struct BaseEntity {
   EntityKind entity_kind;
   int id;
-  char *name;
-  char *description;
+  char name[32];
+  char description[256];
 } BaseEntity;
