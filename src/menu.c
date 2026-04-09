@@ -20,6 +20,30 @@ BaseMenu examine_option = {
   .description = { "Examine your surrounding or yourself." },
 };
 
+BaseMenu examine_room_option = {
+  .menu_kind = MENU_EXAMINE_ROOM,
+  .name = { "Examine room" },
+  .description = { "Examine your surroundings." },
+};
+
+BaseMenu examine_inventory_option = {
+  .menu_kind = MENU_EXAMINE_INVENTORY,
+  .name = { "Examine inventory" },
+  .description = { "Examine your items." },
+};
+
+BaseMenu examine_map_option = {
+  .menu_kind = MENU_EXAMINE_MAP,
+  .name = { "Examine map" },
+  .description = { "Examine how far you have traveled." },
+};
+
+BaseMenu examine_stats_option = {
+  .menu_kind = MENU_EXAMINE_STATS,
+  .name = { "Examine stats" },
+  .description = { "Examine how far you have grown." },
+};
+
 BaseMenu fight_option = {
   .menu_kind = MENU_FIGHT,
   .name = { "Fight" },
@@ -70,6 +94,26 @@ MenuNode explore_node = {
 MenuNode examine_node = {
   .menu_node_kind = MENU_NODE_BASE_MENU,
   .data.base_menu = &examine_option,
+};
+
+MenuNode examine_room_node = {
+  .menu_node_kind = MENU_NODE_EXAMINE_ROOM,
+  .data.base_menu = &examine_room_option,
+};
+
+MenuNode examine_inventory_node = {
+  .menu_node_kind = MENU_NODE_EXAMINE_INVENTORY,
+  .data.base_menu = &examine_inventory_option,
+};
+
+MenuNode examine_map_node = {
+  .menu_node_kind = MENU_NODE_EXAMINE_MAP,
+  .data.base_menu = &examine_map_option,
+};
+
+MenuNode examine_stats_node = {
+  .menu_node_kind = MENU_NODE_EXAMINE_STATS,
+  .data.base_menu = &examine_stats_option,
 };
 
 MenuNode fight_node = {
@@ -169,6 +213,7 @@ void display_menu(Menu *menu) {
       case MENU_NODE_EXAMINE_INVENTORY:
         print_text(PRINT_FAST3, "[%d] Examine %s\n", i, menu_node->data.item->name);
         break;
+      case MENU_NODE_BACK:
       case MENU_NODE_QUIT:
         print_text(PRINT_FAST3, "[%d] %s\n", i, menu_node->data.base_action->name);
         break;
@@ -199,7 +244,16 @@ Menu *parse_player_choice(Player *player, Menu *menu, char *choice) {
       menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &east_room);
       menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &west_room);
       menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &south_room);
-      menu->options[i++] = build_menu_node(MENU_NODE_BACK, &back_node);
+      menu->options[i++] = &back_node;
+    }
+    case MENU_NODE_EXAMINE: {
+      menu_realloc(menu, 5);
+      int i = -1;
+      menu->options[i++] = &examine_room_node;
+      menu->options[i++] = &examine_inventory_node;
+      menu->options[i++] = &examine_map_node;
+      menu->options[i++] = &examine_stats_node;
+      menu->options[i++] = &back_node;
     }
 
   }
