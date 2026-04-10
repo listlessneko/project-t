@@ -71,7 +71,8 @@ typedef struct Menu {
   char name[32];
   char description[256];
   struct Menu *prev_menu;
-  struct Menu *next_menu;
+  struct Menu *prev_page;
+  struct Menu *next_page;
   int options_count;
   MenuNode *options[];
 } Menu;
