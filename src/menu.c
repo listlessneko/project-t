@@ -135,7 +135,9 @@ Menu main_menu = {
   .menu_kind = MENU_MAIN,
   .name = { "Main Menu" },
   .description = { "This is the main menu." },
-  .count = 4,
+  .prev_menu = NULL,
+  .next_menu = NULL,
+  .options_count = 4,
   .options = {
     &explore_node,
     &examine_node,
@@ -153,15 +155,15 @@ MenuNode *build_menu_node(MenuNodeKind menu_node_kind, void *data) {
   menu_node->menu_node_kind = menu_node_kind;
 
   switch (menu_node_kind) {
-    case MENU_NODE_EXPLORE: {
+    case MENU_NODE_EXPLORE_ROOM: {
       BaseRoom *base_room = data;
       strncpy(menu_node->name, base_room->name, sizeof(menu_node->name));
       strncpy(menu_node->description, base_room->description, sizeof(menu_node->description));
       menu_node->data.room = base_room->room;
       break;
     }
-    case MENU_NODE_EXAMINE_ROOM:
-    case MENU_NODE_EXAMINE_INVENTORY: {
+    case MENU_NODE_EXAMINE_ROOM_ITEM:
+    case MENU_NODE_EXAMINE_INVENTORY_ITEM: {
       menu_node->data.item = data;
       break;
     }
@@ -181,15 +183,36 @@ void menu_realloc(Menu *menu, int count) {
     return;
   }
   menu = temp;
-  menu->count = count;
+  menu->options_count = count;
   return;
 };
+
+void destroy_menu_node(MenuNode *menu_node) {
+  if (menu_node == NULL) {
+    return;
+  }
+  free(menu_node);
+}
+
+void destroy_menu(Menu *menu) {
+  if (menu == NULL) {
+    return;
+  }
+
+  for (int i = 0; i < menu->options_count; i++) {
+    destroy_menu_node(menu->options[i]);
+  }
+
+  destroy_menu(menu->prev_menu);
+  destroy_menu(menu->next_menu);
+  free(menu);
+}
 
 void display_menu(Menu *menu) {
   print_text(PRINT_NORMAL5, "%s\n", menu->name);
   print_text(PRINT_NORMAL5, "%s\n", menu->description);
 
-  for (int i = 0; i < menu->count; i++) {
+  for (int i = 0; i < menu->options_count; i++) {
     MenuNode *menu_node = menu->options[i];
     MenuNodeKind menu_node_kind = menu_node->menu_node_kind;
 
@@ -224,15 +247,23 @@ void display_menu(Menu *menu) {
   return;
 }
 
-Menu *parse_player_choice(Player *player, Menu *menu, char *choice) {
+Menu *parse_player_choice(Player *player, Menu *current_menu, char *choice) {
   int choice_int = atoi(choice);
 
-  MenuNode *menu_node = menu->options[choice_int-1];
+  MenuNode *menu_node = current_menu->options[choice_int-1];
   MenuNodeKind menu_node_kind = menu_node->menu_node_kind;
+
+  Menu *new_menu = malloc(sizeof(Menu) + sizeof(MenuNode *) * 1);
+  if (new_menu == NULL) {
+    return NULL;
+  }
+
+  new_menu->prev_menu = current_menu;
+  current_menu->next_menu = new_menu;
 
   switch (menu_node_kind) {
     case MENU_NODE_EXPLORE: {
-      menu_realloc(menu, 5);
+      menu_realloc(new_menu, 5);
       int i = -1;
       Room *current_room = player->current_room;
       north_room.room = current_room->north;
@@ -240,22 +271,49 @@ Menu *parse_player_choice(Player *player, Menu *menu, char *choice) {
       west_room.room = current_room->west;
       south_room.room = current_room->south;
 
-      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &north_room);
-      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &east_room);
-      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &west_room);
-      menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &south_room);
-      menu->options[i++] = &back_node;
+      new_menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &north_room);
+      new_menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &east_room);
+      new_menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &west_room);
+      new_menu->options[i++] = build_menu_node(MENU_NODE_EXPLORE_ROOM, &south_room);
+      new_menu->options[i++] = &back_node;
     }
     case MENU_NODE_EXAMINE: {
-      menu_realloc(menu, 5);
+      menu_realloc(new_menu, 5);
       int i = -1;
-      menu->options[i++] = &examine_room_node;
-      menu->options[i++] = &examine_inventory_node;
-      menu->options[i++] = &examine_map_node;
-      menu->options[i++] = &examine_stats_node;
-      menu->options[i++] = &back_node;
+      new_menu->options[i++] = &examine_room_node;
+      new_menu->options[i++] = &examine_inventory_node;
+      new_menu->options[i++] = &examine_map_node;
+      new_menu->options[i++] = &examine_stats_node;
+      new_menu->options[i++] = &back_node;
     }
-
+    case MENU_NODE_EXAMINE_ROOM: {
+      Room *current_room = player->current_room;
+      menu_realloc(new_menu, current_room->items_count + 1);
+      int i = 0;
+      for (i = 0; i < current_room->items_count; i++) {
+        new_menu->options[i] = build_menu_node(MENU_NODE_EXAMINE_ROOM_ITEM, current_room->items[i]);
+      }
+      new_menu->options[i] = &back_node;
+    }
+    case MENU_NODE_EXAMINE_INVENTORY: {
+      menu_realloc(new_menu, player->inventory_count + 1);
+      int i = 0;
+      for (i = 0; i < player->inventory_count; i++) {
+        new_menu->options[i] = build_menu_node(MENU_NODE_EXAMINE_INVENTORY_ITEM, player->inventory[i]);
+      }
+      new_menu->options[i] = &back_node;
+    }
+    case MENU_NODE_EXAMINE_MAP: {
+      menu_realloc(new_menu, 1);
+      new_menu->options[0] = &back_node;
+    }
+    case MENU_NODE_EXAMINE_STATS: {
+      menu_realloc(new_menu, 1);
+      new_menu->options[0] = &back_node;
+    }
+    case MENU_NODE_BACK: {
+      new_menu = current_menu->prev_menu;
+    }
   }
-return menu;
+return new_menu;
 }
