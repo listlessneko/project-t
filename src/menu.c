@@ -136,7 +136,8 @@ Menu main_menu = {
   .name = { "Main Menu" },
   .description = { "This is the main menu." },
   .prev_menu = NULL,
-  .next_menu = NULL,
+  .prev_page = NULL,
+  .next_page = NULL,
   .options_count = 4,
   .options = {
     &explore_node,
@@ -203,8 +204,8 @@ void destroy_menu(Menu *menu) {
     destroy_menu_node(menu->options[i]);
   }
 
-  destroy_menu(menu->prev_menu);
-  destroy_menu(menu->next_menu);
+  destroy_menu(menu->prev_page);
+  destroy_menu(menu->next_page);
   free(menu);
 }
 
@@ -259,10 +260,10 @@ Menu *parse_player_choice(Player *player, Menu *current_menu, char *choice) {
   }
 
   new_menu->prev_menu = current_menu;
-  current_menu->next_menu = new_menu;
 
   switch (menu_node_kind) {
     case MENU_NODE_EXPLORE: {
+      destroy_menu(current_menu);
       menu_realloc(new_menu, 5);
       int i = -1;
       Room *current_room = player->current_room;
