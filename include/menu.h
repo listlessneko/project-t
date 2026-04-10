@@ -70,7 +70,9 @@ typedef struct Menu {
   MenuKind menu_kind;
   char name[32];
   char description[256];
-  int count;
+  struct Menu *prev_menu;
+  struct Menu *next_menu;
+  int options_count;
   MenuNode *options[];
 } Menu;
 
