@@ -8,8 +8,6 @@
 #include "terminal.h"
 #include "utils.h"
 
-char *directions[] = { "north", "east", "west", "south" };
-
 RoomKindCounter room_kind_counter = {
   .safe = 0,
   .easy = 0,
@@ -139,6 +137,16 @@ RoomContentsTemplate hard_room_contents_templates[] = {
     .kind = ROOM_HARD
   }
 };
+
+const char *direction_to_string(DirectionKind direction_kind) {
+  switch (direction_kind) {
+    case DIRECTION_NORTH: return "north";
+    case DIRECTION_EAST: return "east";
+    case DIRECTION_WEST: return "west";
+    case DIRECTION_SOUTH: return "south";
+    default: return "unknown";
+  }
+}
 
 int add_item_to_room(Room *room, Item *item) {
   if (room == NULL || item == NULL) {

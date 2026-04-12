@@ -9,6 +9,13 @@
 #define MAX_HARD_ROOMS 3
 #define MAX_ROOM_ITEMS 3
 
+typedef enum DirectionKind {
+  DIRECTION_NORTH,
+  DIRECTION_EAST,
+  DIRECTION_WEST,
+  DIRECTION_SOUTH,
+} DirectionKind;
+
 typedef struct RoomKindCounter {
   int safe;
   int easy;
@@ -65,8 +72,7 @@ typedef struct VisitedRooms {
   int count;
 } VisitedRooms;
 
-extern char *directions[];
-
+const char *direction_to_string(DirectionKind direction_kind);
 int explore(Player *player);
 void explore_room(Player *player, int choice);
 Room *generate_room(Player *player, int choice);
