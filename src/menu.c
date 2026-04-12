@@ -102,6 +102,22 @@ Menu main_menu = {
   }
 };
 
+Menu examine_menu = {
+  .name = { "Examine" },
+  .description = { "This is the examine menu." },
+  .prev_menu = &main_menu,
+  .prev_page = NULL,
+  .next_page = NULL,
+  .options_count = 4,
+  .options = {
+    &examine_room_node,
+    &examine_inventory_node,
+    &examine_map_node,
+    &examine_stats_node,
+    &back_node
+  }
+};
+
 MenuNode *build_menu_node(NodeKind node_kind, void *data) {
   MenuNode *menu_node = malloc(sizeof(MenuNode));
   if (menu_node == NULL) {
@@ -229,13 +245,7 @@ Menu *parse_player_choice(Player *player, Menu *current_menu, char *choice) {
       new_menu->options[i++] = &back_node;
     }
     case NODE_MENU_EXAMINE: {
-      Menu *new_menu = menu_realloc(current_menu, 5);
-      int i = -1;
-      new_menu->options[i++] = &examine_room_node;
-      new_menu->options[i++] = &examine_inventory_node;
-      new_menu->options[i++] = &examine_map_node;
-      new_menu->options[i++] = &examine_stats_node;
-      new_menu->options[i++] = &back_node;
+      return new_menu = &examine_menu;
     }
     case NODE_MENU_EXAMINE_ROOM: {
       Room *current_room = player->current_room;
