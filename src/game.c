@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "menu.h"
 #include "items.h"
 #include "inventory.h"
 #include "terminal.h"
@@ -32,6 +33,8 @@ Player *create_player() {
   equip_item(player, player_shield);
 
   initialize_visited_rooms(player);
+
+  player->current_menu = &main_menu;
 
   return player;
 };
@@ -83,5 +86,5 @@ void start_game(Player *player) {
 }
 
 void game_loop(Player *player) {
-  while(!explore(player)) {}
+  while(playing(player)) {}
 }
