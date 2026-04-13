@@ -161,7 +161,7 @@ int add_item_to_room(Room *room, Item *item) {
   return ITEM_ADD_TO_ROOM_SUCCESS;
 }
 
-int remove_item_to_room(Room *room, Item *item) {
+int remove_item_from_room(Room *room, Item *item) {
   if (room == NULL || item == NULL) {
     return ITEM_ADD_TO_ROOM_INVALID;
   }
