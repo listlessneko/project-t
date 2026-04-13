@@ -31,11 +31,9 @@ int remove_item_from_player_inventory(Player *player, Item *item) {
       }
       player->inventory[player->inventory_count-1] = NULL;
       player->inventory_count--;
-
       return ITEM_REMOVE_FROM_INVENTORY_SUCCESS;
     }
   }
-
   return ITEM_REMOVE_FROM_INVENTORY_ERROR;
 }
 
@@ -60,6 +58,8 @@ int equip_item(Player *player, Item *item) {
     case ITEM_ACCESSORY:
       player->accessory = item;
       return ITEM_EQUIP_SUCCESS;
+    default:
+      return ITEM_EQUIP_ERROR;
   }
 }
 
@@ -70,7 +70,7 @@ int unequip_item(Player *player, Item *item) {
 
 int use_item(Player *player, Item *item) {
   if (player == NULL || item == NULL) {
-    return ITEM_USE_ERROR;
+    return ITEM_USE_INVALID;
   }
 
   switch (item->kind) {
@@ -91,7 +91,7 @@ int use_item(Player *player, Item *item) {
     case ITEM_ACCESSORY:
       return ITEM_USE_INVALID;
     default:
-      return ITEM_USE_INVALID;
+      return ITEM_USE_ERROR;
   }
 }
 
