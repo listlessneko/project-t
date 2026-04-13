@@ -1,29 +1,44 @@
+#pragma once
+
 #include "entities.h"
 #include "rooms.h"
 
 typedef enum NodeKind {
-  NODE_MENU_MAIN,
-  NODE_MENU_EXPLORE,
-  NODE_MENU_EXPLORE_ROOM,
-  NODE_MENU_EXAMINE,
-  NODE_MENU_FIGHT,
-  NODE_MENU_EXAMINE_ROOM,
-  NODE_MENU_EXAMINE_ROOM_ITEM,
-  NODE_MENU_EXAMINE_INVENTORY,
-  NODE_MENU_EXAMINE_INVENTORY_ITEM,
-  NODE_MENU_EXAMINE_MAP,
-  NODE_MENU_EXAMINE_STATS,
-  NODE_ACTION_PICK_UP,
-  NODE_ACTION_USE,
-  NODE_ACTION_DROP,
-  NODE_ACTION_THROW_AWAY,
-  NODE_ACTION_BACK,
-  NODE_ACTION_QUIT,
+  NODE_MENU,
+  NODE_ACTION,
 } NodeKind;
+
+typedef enum MenuKind {
+  MENU_MAIN,
+  MENU_EXPLORE,
+  MENU_EXPLORE_ROOM,
+  MENU_EXAMINE,
+  MENU_FIGHT,
+  MENU_EXAMINE_ROOM,
+  MENU_EXAMINE_ROOM_ITEM,
+  MENU_EXAMINE_INVENTORY,
+  MENU_EXAMINE_INVENTORY_ITEM,
+  MENU_EXAMINE_MAP,
+  MENU_EXAMINE_STATS,
+} MenuKind;
+
+typedef enum ActionKind {
+  ACTION_GO,
+  ACTION_PICK_UP,
+  ACTION_USE,
+  ACTION_DROP,
+  ACTION_THROW_AWAY,
+  ACTION_BACK,
+  ACTION_QUIT,
+} ActionKind;
 
 typedef struct MenuNode {
   NodeKind node_kind;
-  char name[32];
+  union {
+    MenuKind menu_kind;
+    ActionKind action_kind;
+  } data_kind;
+  char name[64];
   char description[256];
   union {
     Player *player;
@@ -31,6 +46,9 @@ typedef struct MenuNode {
     Room *room;
     Item *item;
   } data;
+  union {
+    DirectionKind direction;
+  } action;
 } MenuNode;
 
 typedef struct Menu {
@@ -43,8 +61,11 @@ typedef struct Menu {
   MenuNode *options[];
 } Menu;
 
+extern Menu main_menu;
+
+int playing(Player *player);
 MenuNode *build_menu_node(NodeKind node_kind, void *data);
 MenuNode *build_room_menu_node(DirectionKind direction_kind, Room *room);
 Menu *menu_realloc(Menu *menu, int count);
 void display_menu(Menu *menu);
-Menu *parse_player_choice(Player *player, Menu *menu, char *choice);
+MenuNode *parse_player_choice(Player *player, char *choice);

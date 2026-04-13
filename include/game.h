@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entities.h"
+#include "menu.h"
 #include "rooms.h"
 
 typedef struct Enemy {
@@ -34,6 +35,7 @@ typedef struct Player {
   int inventory_count;
   Room *current_room;
   VisitedRooms *visited_rooms;
+  Menu *current_menu;
 } Player;
 
 

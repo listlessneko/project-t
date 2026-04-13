@@ -161,21 +161,21 @@ int add_item_to_room(Room *room, Item *item) {
   return ITEM_ADD_TO_ROOM_SUCCESS;
 }
 
-void explore_room(Player *player, int choice) {
+void explore_room(Player *player, DirectionKind direction) {
   Room **next = NULL;
-  if (choice == 1) {
+  if (direction == DIRECTION_NORTH) {
     next = &player->current_room->north;
-  } else if (choice == 2) {
+  } else if (direction == DIRECTION_EAST) {
     next = &player->current_room->east;
-  } else if (choice == 3) {
+  } else if (direction == DIRECTION_WEST) {
     next = &player->current_room->west;
-  } else if (choice == 4) {
+  } else if (direction == DIRECTION_SOUTH) {
     next = &player->current_room->south;
   }
 
   if (*next == NULL) {
     if (player->visited_rooms->count < MAX_ROOMS) {
-      *next = generate_room(player, choice);
+      *next = generate_room(player, direction);
       player->visited_rooms->visited[(*next)->id] = *next;
       player->visited_rooms->visited[(*next)->id]->visited = 1;
       player->visited_rooms->count++;
@@ -197,7 +197,7 @@ void explore_room(Player *player, int choice) {
   }
 }
 
-Room *generate_room(Player *player, int choice) {
+Room *generate_room(Player *player, DirectionKind direction) {
   Room *new_room;
   if (player->current_room == NULL) {
     new_room = malloc(sizeof(Room));
@@ -303,40 +303,16 @@ Room *generate_room(Player *player, int choice) {
     new_room->enemy = enemy;
   }
 
-  if (choice == 1) {
+  if (direction == DIRECTION_NORTH) {
     new_room->south = player->current_room;
-  } else if (choice == 2) {
+  } else if (direction == DIRECTION_EAST) {
     new_room->west = player->current_room;
-  } else if (choice == 3) {
+  } else if (direction == DIRECTION_WEST) {
     new_room->east = player->current_room;
-  } else if (choice == 4) {
+  } else if (direction == DIRECTION_SOUTH) {
     new_room->north = player->current_room;
   }
   new_room->id = player->visited_rooms->count;
   new_room->visited = 0;
   return new_room;
 }
-
-int explore(Player *player) {
-  print_text(PRINT_FAST3,
-             "[1] Go north\n"
-             "[2] Go east\n"
-             "[3] Go west\n"
-             "[4] Go south\n"
-             );
-
-  char choice[32];
-  read_input(choice, sizeof(choice));
-
-  int choice_int = atoi(choice);
-  if (choice_int >= 1 && choice_int <= 4) {
-    explore_room(player, choice_int);
-  } else if (strcmp(choice, "quit") == 0) {
-    print_text(PRINT_NORMAL5, "You open your eyes and realize it was just a dream.\n");
-    return 1;
-  } else {
-    print_text(PRINT_NORMAL5, "You stare off into the distance...\n");
-  }
-  return 0;
-}
-
