@@ -40,6 +40,7 @@ typedef struct MenuNode {
   } data_kind;
   char name[64];
   char description[256];
+  int is_static;
   union {
     Player *player;
     Enemy *enemy;
@@ -54,6 +55,7 @@ typedef struct MenuNode {
 typedef struct Menu {
   char name[32];
   char description[256];
+  int is_static;
   struct Menu *prev_menu;
   struct Menu *prev_page;
   struct Menu *next_page;
