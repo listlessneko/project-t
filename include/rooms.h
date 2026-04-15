@@ -73,6 +73,7 @@ typedef struct VisitedRooms {
 } VisitedRooms;
 
 const char *direction_to_string(DirectionKind direction_kind);
+char direction_to_char(DirectionKind direction_kind);
 int explore(Player *player);
 void explore_room(Player *player, DirectionKind direction);
 Room *generate_room(Player *player, DirectionKind direction);

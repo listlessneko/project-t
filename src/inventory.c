@@ -14,7 +14,7 @@ int add_item_to_player_inventory(Player *player, Item *item) {
     return ITEM_ADD_TO_INVENTORY_INVALID;
   }
 
-  player->inventory[player->inventory_count-1] = item;
+  player->inventory[player->inventory_count] = item;
   player->inventory_count++;
   return ITEM_ADD_TO_INVENTORY_SUCCESS;
 }

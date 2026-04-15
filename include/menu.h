@@ -12,14 +12,14 @@ typedef enum MenuKind {
   MENU_MAIN,
   MENU_EXPLORE,
   MENU_EXPLORE_ROOM,
-  MENU_EXAMINE,
+  MENU_VIEW,
   MENU_FIGHT,
-  MENU_EXAMINE_ROOM,
-  MENU_EXAMINE_ROOM_ITEM,
-  MENU_EXAMINE_INVENTORY,
-  MENU_EXAMINE_INVENTORY_ITEM,
-  MENU_EXAMINE_MAP,
-  MENU_EXAMINE_STATS,
+  MENU_VIEW_ROOM,
+  MENU_VIEW_ROOM_ITEM,
+  MENU_VIEW_INVENTORY,
+  MENU_VIEW_INVENTORY_ITEM,
+  MENU_VIEW_MAP,
+  MENU_VIEW_STATS,
 } MenuKind;
 
 typedef enum ActionKind {
@@ -28,6 +28,8 @@ typedef enum ActionKind {
   ACTION_USE,
   ACTION_DROP,
   ACTION_THROW_AWAY,
+  ACTION_PREVIOUS,
+  ACTION_NEXT,
   ACTION_BACK,
   ACTION_QUIT,
 } ActionKind;
@@ -40,6 +42,7 @@ typedef struct MenuNode {
   } data_kind;
   char name[64];
   char description[256];
+  char key;
   int is_static;
   union {
     Player *player;
