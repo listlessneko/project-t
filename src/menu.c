@@ -31,7 +31,7 @@ MenuNode view_node = {
 MenuNode view_room_node = {
   .node_kind = NODE_MENU,
   .data_kind.menu_kind = MENU_VIEW_ROOM,
-  .name = { "View area" },
+  .name = { "Area" },
   .description = { "View your surroundings." },
   .key = 'A',
   .is_static = 1,
@@ -40,7 +40,7 @@ MenuNode view_room_node = {
 MenuNode view_inventory_node = {
   .node_kind = NODE_MENU,
   .data_kind.menu_kind = MENU_VIEW_INVENTORY,
-  .name = { "View inventory" },
+  .name = { "Inventory" },
   .description = { "View your items." },
   .key = 'I',
   .is_static = 1,
@@ -49,7 +49,7 @@ MenuNode view_inventory_node = {
 MenuNode view_map_node = {
   .node_kind = NODE_MENU,
   .data_kind.menu_kind = MENU_VIEW_MAP,
-  .name = { "View map" },
+  .name = { "Map" },
   .description = { "View how far you have traveled." },
   .key = 'M',
   .is_static = 1,
@@ -58,7 +58,7 @@ MenuNode view_map_node = {
 MenuNode view_stats_node = {
   .node_kind = NODE_MENU,
   .data_kind.menu_kind = MENU_VIEW_STATS,
-  .name = { "View stats" },
+  .name = { "Stats" },
   .description = { "View how far you have grown." },
   .key = 'S',
   .is_static = 1,
@@ -187,6 +187,7 @@ MenuNode *build_view_item_menu_node(MenuKind menu_kind, Item *item) {
   menu_node->node_kind = NODE_MENU;
   menu_node->data_kind.menu_kind = menu_kind;
   menu_node->data.item = item;
+  menu_node->key = '\0';
 
   snprintf(menu_node->name, sizeof(menu_node->name), "%s", item->name);
   return menu_node;
@@ -205,9 +206,9 @@ MenuNode *build_explore_room_menu_node(DirectionKind direction_kind, Room *room)
   menu_node->key = direction_to_char(direction_kind);
 
   if (room == NULL) {
-    snprintf(menu_node->name, sizeof(menu_node->name), "Go %s (???)", direction_to_string(direction_kind));
+    snprintf(menu_node->name, sizeof(menu_node->name), "%s (???)", direction_to_string(direction_kind));
   } else {
-    snprintf(menu_node->name, sizeof(menu_node->name), "Go %s (%s)", direction_to_string(direction_kind), room->name);
+    snprintf(menu_node->name, sizeof(menu_node->name), "%s (%s)", direction_to_string(direction_kind), room->name);
   }
   return menu_node;
 };
@@ -217,6 +218,10 @@ Menu *menu_malloc(int options_count) {
   if (menu == NULL) {
     return NULL;
   }
+  menu->prev_menu = NULL;
+  menu->next_page = NULL;
+  menu->prev_page = NULL;
+  menu->is_static = 0;
   menu->options_count = options_count;
   return menu;
 };
@@ -268,11 +273,13 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       int current_item = 0;
       int remaining = player->inventory_count - current_item;
       int page_size = remaining > item_limit ? item_limit : remaining;
+      int sub_pages = (player->inventory_count + item_limit - 1) / item_limit;
+      int current_sub_page = 1;
 
       Menu *next_page;
       new_menu = menu_malloc(page_size + nav_options);
-      strncpy(new_menu->name, "View Inventory Menu", sizeof(new_menu->name) - 1);
-      new_menu->name[31] = '\0';
+      snprintf(new_menu->name, sizeof(new_menu->name), "Inventory:\n (Page %d of %d)", current_sub_page, sub_pages);
+      new_menu->name[63] = '\0';
       Menu *first_page = new_menu;
       int i;
       for (i = 0; i < page_size; i++) {
@@ -284,10 +291,12 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu->options[i++] = &back_node;
       new_menu->prev_menu = player->current_menu;
 
-      while (current_item < player->inventory_count) {
+      while (current_sub_page < sub_pages) {
+        current_sub_page++;
         remaining = player->inventory_count - current_item;
         page_size = remaining > item_limit ? item_limit : remaining;
         next_page = menu_malloc(page_size + nav_options);
+        snprintf(next_page->name, sizeof(next_page->name), "Inventory:\n (Page %d of %d)", current_sub_page, sub_pages);
         int j;
         for (j = 0; j < page_size; j++) {
           next_page->options[j] = build_view_item_menu_node(MENU_VIEW_INVENTORY_ITEM, player->inventory[current_item]);
@@ -296,6 +305,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
         next_page->options[j++] = &prev_node;
         next_page->options[j++] = &next_node;
         next_page->options[j++] = &back_node;
+        next_page->prev_menu = player->current_menu;
         new_menu->next_page = next_page;
         next_page->prev_page = new_menu;
         new_menu = next_page;
@@ -329,6 +339,7 @@ void destroy_menu_pages(Menu *menu, Menu *first_page) {
 }
 
 void destroy_menu(Menu *menu) {
+  print_text(PRINT_FAST3, "Destroying menu: %s\n", menu->name);
   if (menu == NULL || menu->is_static) {
     return;
   }
@@ -344,9 +355,9 @@ void destroy_menu(Menu *menu) {
 }
 
 void display_menu(Menu *menu) {
-  /*print_text(PRINT_NORMAL5, "%s\n", menu->name);*/
-  /*print_text(PRINT_NORMAL5, "%s\n", menu->description);*/
-  /**/
+  print_text(PRINT_NORMAL5, "%s\n", menu->name);
+  print_text(PRINT_NORMAL5, "%s\n", menu->description);
+
   for (int i = 0; i < menu->options_count; i++) {
     MenuNode *menu_node = menu->options[i];
     if (menu_node->key == '\0') {
@@ -358,9 +369,9 @@ void display_menu(Menu *menu) {
       menu_node->data_kind.action_kind == ACTION_BACK
       )
     ) {
-      print_text(PRINT_FAST3, "[%c] %s", menu_node->key, menu_node->name);
+      print_text(PRINT_FAST3, "[%c]%s", menu_node->key, menu_node->name+1);
     } else {
-      print_text(PRINT_FAST3, "[%c] %s\n", menu_node->key, menu_node->name);
+      print_text(PRINT_FAST3, "[%c]%s\n", menu_node->key, menu_node->name+1);
     }
   }
   return;
@@ -430,7 +441,6 @@ MenuNode *parse_player_choice(Player *player, char *choice) {
 
 int playing(Player *player) {
   print_text(PRINT_FAST3, "(Looping...)\n");
-  print_text(PRINT_FAST3, "Current Menu: %s\n", player->current_menu->name);
   display_menu(player->current_menu);
   char choice[32];
   read_input(choice, sizeof(choice));

@@ -24,13 +24,37 @@ Player *create_player() {
   player->gold = 0;
   player->inventory_count = 0;
 
-  Item *player_weapon = create_item(ITEM_WEAPON, "Sword", 0, 1, 0);
-  add_item_to_player_inventory(player, player_weapon);
-  equip_item(player, player_weapon);
+  Item *sword = create_item(ITEM_WEAPON, "Sword", 0, 1, 0);
+  add_item_to_player_inventory(player, sword);
+  equip_item(player, sword);
 
-  Item *player_shield = create_item(ITEM_SHIELD, "Shield", 0, 0, 1);
-  add_item_to_player_inventory(player, player_shield);
-  equip_item(player, player_shield);
+  Item *shield = create_item(ITEM_SHIELD, "Shield", 0, 0, 1);
+  add_item_to_player_inventory(player, shield);
+  equip_item(player, shield);
+
+  Item *axe = create_item(ITEM_WEAPON, "Axe", 0, 1, 0);
+  add_item_to_player_inventory(player, axe);
+
+  Item *round_shield = create_item(ITEM_SHIELD, "Round Shield", 0, 0, 1);
+  add_item_to_player_inventory(player, round_shield);
+
+  Item *Dagger = create_item(ITEM_WEAPON, "Dagger", 0, 1, 0);
+  add_item_to_player_inventory(player, Dagger);
+
+  Item *rectangle_shield = create_item(ITEM_SHIELD, "Rectangle Shield", 0, 0, 1);
+  add_item_to_player_inventory(player, rectangle_shield);
+
+  Item *short_sword = create_item(ITEM_WEAPON, "Short Sword", 0, 1, 0);
+  add_item_to_player_inventory(player, short_sword);
+
+  Item *square_shield = create_item(ITEM_SHIELD, "Square Shield", 0, 0, 1);
+  add_item_to_player_inventory(player, square_shield);
+
+  Item *long_sword = create_item(ITEM_WEAPON, "Long Sword", 0, 1, 0);
+  add_item_to_player_inventory(player, long_sword);
+
+  Item *triangle_shield = create_item(ITEM_SHIELD, "Triangle Shield", 0, 0, 1);
+  add_item_to_player_inventory(player, triangle_shield);
 
   initialize_visited_rooms(player);
 

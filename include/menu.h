@@ -56,7 +56,7 @@ typedef struct MenuNode {
 } MenuNode;
 
 typedef struct Menu {
-  char name[32];
+  char name[64];
   char description[256];
   int is_static;
   struct Menu *prev_menu;
