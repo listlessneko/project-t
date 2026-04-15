@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "menu.h"
 #include "entities.h"
 #include "game.h"
@@ -14,45 +15,52 @@ MenuNode explore_node = {
   .data_kind.menu_kind = MENU_EXPLORE,
   .name = { "Explore" },
   .description = { "Continue on your adventure." },
+  .key = 'E',
   .is_static = 1,
 };
 
-MenuNode examine_node = {
+MenuNode view_node = {
   .node_kind = NODE_MENU,
-  .data_kind.menu_kind = MENU_EXAMINE,
-  .name = { "Examine" },
-  .description = { "Examine your surrounding or yourself." },
+  .data_kind.menu_kind = MENU_VIEW,
+  .name = { "View" },
+  .description = { "View your surrounding or yourself." },
+  .key = 'V',
   .is_static = 1,
 };
 
-MenuNode examine_room_node = {
+MenuNode view_room_node = {
   .node_kind = NODE_MENU,
-  .data_kind.menu_kind = MENU_EXAMINE_ROOM,
-  .name = { "Examine room" },
-  .description = { "Examine your surroundings." },
-};
-
-MenuNode examine_inventory_node = {
-  .node_kind = NODE_MENU,
-  .data_kind.menu_kind = MENU_EXAMINE_INVENTORY,
-  .name = { "Examine inventory" },
-  .description = { "Examine your items." },
+  .data_kind.menu_kind = MENU_VIEW_ROOM,
+  .name = { "View area" },
+  .description = { "View your surroundings." },
+  .key = 'A',
   .is_static = 1,
 };
 
-MenuNode examine_map_node = {
+MenuNode view_inventory_node = {
   .node_kind = NODE_MENU,
-  .data_kind.menu_kind = MENU_EXAMINE_MAP,
-  .name = { "Examine map" },
-  .description = { "Examine how far you have traveled." },
+  .data_kind.menu_kind = MENU_VIEW_INVENTORY,
+  .name = { "View inventory" },
+  .description = { "View your items." },
+  .key = 'I',
   .is_static = 1,
 };
 
-MenuNode examine_stats_node = {
+MenuNode view_map_node = {
   .node_kind = NODE_MENU,
-  .data_kind.menu_kind = MENU_EXAMINE_STATS,
-  .name = { "Examine stats" },
-  .description = { "Examine how far you have grown." },
+  .data_kind.menu_kind = MENU_VIEW_MAP,
+  .name = { "View map" },
+  .description = { "View how far you have traveled." },
+  .key = 'M',
+  .is_static = 1,
+};
+
+MenuNode view_stats_node = {
+  .node_kind = NODE_MENU,
+  .data_kind.menu_kind = MENU_VIEW_STATS,
+  .name = { "View stats" },
+  .description = { "View how far you have grown." },
+  .key = 'S',
   .is_static = 1,
 };
 
@@ -61,6 +69,7 @@ MenuNode fight_node = {
   .data_kind.menu_kind = MENU_FIGHT,
   .name = { "Fight" },
   .description = { "Eliminate the enemy." },
+  .key = 'F',
   .is_static = 1,
 };
 
@@ -69,6 +78,7 @@ MenuNode pick_up_node = {
   .data_kind.action_kind = ACTION_PICK_UP,
   .name = { "Pick Up" },
   .description = { "Pick up item." },
+  .key = 'E',
   .is_static = 1,
 };
 
@@ -77,6 +87,7 @@ MenuNode use_node = {
   .data_kind.action_kind = ACTION_USE,
   .name = { "Use" },
   .description = { "Use item." },
+  .key = 'E',
   .is_static = 1,
 };
 
@@ -85,6 +96,7 @@ MenuNode drop_node = {
   .data_kind.action_kind = ACTION_DROP,
   .name = { "Drop" },
   .description = { "Drop item." },
+  .key = 'D',
   .is_static = 1,
 };
 
@@ -93,14 +105,34 @@ MenuNode throw_away_node = {
   .data_kind.action_kind = ACTION_THROW_AWAY,
   .name = { "Throw Away" },
   .description = { "Throw away item." },
+  .key = 'T',
+  .is_static = 1,
+};
+
+MenuNode prev_node = {
+  .node_kind = NODE_ACTION,
+  .data_kind.action_kind = ACTION_PREVIOUS,
+  .name = { "Previous " },
+  .description = { "Back to previous page." },
+  .key = 'P',
+  .is_static = 1,
+};
+
+MenuNode next_node = {
+  .node_kind = NODE_ACTION,
+  .data_kind.action_kind = ACTION_NEXT,
+  .name = { "Next " },
+  .description = { "Go to next page." },
+  .key = 'N',
   .is_static = 1,
 };
 
 MenuNode back_node = {
   .node_kind = NODE_ACTION,
   .data_kind.action_kind = ACTION_BACK,
-  .name = { "Back" },
+  .name = { "Back\n" },
   .description = { "Back to previous menu." },
+  .key = 'B',
   .is_static = 1,
 };
 
@@ -109,6 +141,7 @@ MenuNode quit_node = {
   .data_kind.action_kind = ACTION_QUIT,
   .name = { "Quit" },
   .description = { "Return to reality." },
+  .key = 'Q',
   .is_static = 1,
 };
 
@@ -122,30 +155,30 @@ Menu main_menu = {
   .options_count = 4,
   .options = {
     &explore_node,
-    &examine_node,
+    &view_node,
     &fight_node,
     &quit_node
   }
 };
 
-Menu examine_menu = {
-  .name = { "Examine" },
-  .description = { "This is the examine menu." },
+Menu view_menu = {
+  .name = { "View" },
+  .description = { "This is the view menu." },
   .prev_menu = &main_menu,
   .is_static = 1,
   .prev_page = NULL,
   .next_page = NULL,
   .options_count = 5,
   .options = {
-    &examine_room_node,
-    &examine_inventory_node,
-    &examine_map_node,
-    &examine_stats_node,
+    &view_room_node,
+    &view_inventory_node,
+    &view_map_node,
+    &view_stats_node,
     &back_node
   }
 };
 
-MenuNode *build_examine_item_menu_node(MenuKind menu_kind, Item *item) {
+MenuNode *build_view_item_menu_node(MenuKind menu_kind, Item *item) {
   MenuNode *menu_node = malloc(sizeof(MenuNode));
   if (menu_node == NULL) {
     return NULL;
@@ -155,7 +188,7 @@ MenuNode *build_examine_item_menu_node(MenuKind menu_kind, Item *item) {
   menu_node->data_kind.menu_kind = menu_kind;
   menu_node->data.item = item;
 
-  snprintf(menu_node->name, sizeof(menu_node->name), "Examine %s", item->name);
+  snprintf(menu_node->name, sizeof(menu_node->name), "%s", item->name);
   return menu_node;
 };
 
@@ -169,6 +202,7 @@ MenuNode *build_explore_room_menu_node(DirectionKind direction_kind, Room *room)
   menu_node->data_kind.action_kind = ACTION_GO;
   menu_node->data.room = room;
   menu_node->action.direction = direction_kind;
+  menu_node->key = direction_to_char(direction_kind);
 
   if (room == NULL) {
     snprintf(menu_node->name, sizeof(menu_node->name), "Go %s (???)", direction_to_string(direction_kind));
@@ -195,8 +229,9 @@ void destroy_menu_node(MenuNode *menu_node) {
 }
 
 Menu *build_menu(MenuKind menu_kind, Player *player) {
+  print_text(PRINT_FAST3, "Building menu...\n");
 
-  Menu *new_menu = NULL;
+  Menu *new_menu;
 
   switch (menu_kind) {
     case MENU_MAIN: {
@@ -214,40 +249,83 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu->options[4] = &back_node;
       break;
     }
-    case MENU_EXAMINE: {
-      return new_menu = &examine_menu;
+    case MENU_VIEW: {
+      return new_menu = &view_menu;
     }
-    case MENU_EXAMINE_ROOM: {
+    case MENU_VIEW_ROOM: {
       Room *current_room = player->current_room;
       new_menu = menu_malloc(current_room->items_count + 1);
       int i = 0;
       for (i = 0; i < current_room->items_count; i++) {
-        new_menu->options[i] = build_examine_item_menu_node(MENU_EXAMINE_ROOM_ITEM, current_room->items[i]);
+        new_menu->options[i] = build_view_item_menu_node(MENU_VIEW_ROOM_ITEM, current_room->items[i]);
       }
       new_menu->options[i] = &back_node;
       break;
     }
-    case MENU_EXAMINE_INVENTORY: {
-      new_menu = menu_malloc(player->inventory_count + 1);
-      int i = 0;
-      for (i = 0; i < player->inventory_count; i++) {
-        new_menu->options[i] = build_examine_item_menu_node(MENU_EXAMINE_INVENTORY_ITEM, player->inventory[i]);
+    case MENU_VIEW_INVENTORY: {
+      int item_limit = 4;
+      int nav_options = 3;
+      int current_item = 0;
+      int remaining = player->inventory_count - current_item;
+      int page_size = remaining > item_limit ? item_limit : remaining;
+
+      Menu *next_page;
+      new_menu = menu_malloc(page_size + nav_options);
+      strncpy(new_menu->name, "View Inventory Menu", sizeof(new_menu->name) - 1);
+      new_menu->name[31] = '\0';
+      Menu *first_page = new_menu;
+      int i;
+      for (i = 0; i < page_size; i++) {
+        new_menu->options[i] = build_view_item_menu_node(MENU_VIEW_INVENTORY_ITEM, player->inventory[current_item]);
+        current_item++;
       }
-      new_menu->options[i] = &back_node;
+      new_menu->options[i++] = &prev_node;
+      new_menu->options[i++] = &next_node;
+      new_menu->options[i++] = &back_node;
+      new_menu->prev_menu = player->current_menu;
+
+      while (current_item < player->inventory_count) {
+        remaining = player->inventory_count - current_item;
+        page_size = remaining > item_limit ? item_limit : remaining;
+        next_page = menu_malloc(page_size + nav_options);
+        int j;
+        for (j = 0; j < page_size; j++) {
+          next_page->options[j] = build_view_item_menu_node(MENU_VIEW_INVENTORY_ITEM, player->inventory[current_item]);
+          current_item++;
+        }
+        next_page->options[j++] = &prev_node;
+        next_page->options[j++] = &next_node;
+        next_page->options[j++] = &back_node;
+        new_menu->next_page = next_page;
+        next_page->prev_page = new_menu;
+        new_menu = next_page;
+      }
+      new_menu->next_page = first_page;
+      first_page->prev_page = new_menu;
+      new_menu = first_page;
       break;
     }
-    case MENU_EXAMINE_MAP: {
+    default: {
       new_menu = menu_malloc(1);
-      new_menu->options[0] = &back_node;
-      break;
-    }
-    case MENU_EXAMINE_STATS: {
-      new_menu = menu_malloc(1);
+      strncpy(new_menu->name, "Empty Menu", sizeof(new_menu->name) - 1);
       new_menu->options[0] = &back_node;
       break;
     }
   }
   return new_menu;
+}
+
+void destroy_menu_pages(Menu *menu, Menu *first_page) {
+  if (menu == NULL || menu == first_page) {
+    return;
+  }
+
+  for (int i = 0; i < menu->options_count; i++) {
+    destroy_menu_node(menu->options[i]);
+  }
+  
+  destroy_menu_pages(menu->next_page, first_page);
+  free(menu);
 }
 
 void destroy_menu(Menu *menu) {
@@ -259,8 +337,9 @@ void destroy_menu(Menu *menu) {
     destroy_menu_node(menu->options[i]);
   }
 
-  destroy_menu(menu->prev_page);
-  destroy_menu(menu->next_page);
+  if (menu->next_page != NULL) {
+    destroy_menu_pages(menu->next_page, menu);
+  }
   free(menu);
 }
 
@@ -270,7 +349,19 @@ void display_menu(Menu *menu) {
   /**/
   for (int i = 0; i < menu->options_count; i++) {
     MenuNode *menu_node = menu->options[i];
-    print_text(PRINT_FAST3, "[%d] %s\n", i+1, menu_node->name);
+    if (menu_node->key == '\0') {
+      print_text(PRINT_FAST3, "[%d] %s\n", i+1, menu_node->name);
+    } else if (
+      menu_node->node_kind == NODE_ACTION && (
+      menu_node->data_kind.action_kind == ACTION_NEXT ||
+      menu_node->data_kind.action_kind == ACTION_PREVIOUS ||
+      menu_node->data_kind.action_kind == ACTION_BACK
+      )
+    ) {
+      print_text(PRINT_FAST3, "[%c] %s", menu_node->key, menu_node->name);
+    } else {
+      print_text(PRINT_FAST3, "[%c] %s\n", menu_node->key, menu_node->name);
+    }
   }
   return;
 }
@@ -280,7 +371,21 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
     case ACTION_GO: {
       explore_room(player, choice->action.direction);
       destroy_menu(player->current_menu);
-      player->current_menu = &main_menu;
+      Menu *new_menu = build_menu(MENU_EXPLORE, player);
+      new_menu->prev_menu = &main_menu;
+      player->current_menu = new_menu;
+      return 1;
+    }
+    /*case ACTION_PICK_UP:*/
+    /*case ACTION_USE:*/
+    /*case ACTION_DROP:*/
+    /*case ACTION_THROW_AWAY:*/
+    case ACTION_PREVIOUS: {
+      player->current_menu = player->current_menu->prev_page;
+      return 1;
+    }
+    case ACTION_NEXT: {
+      player->current_menu = player->current_menu->next_page;
       return 1;
     }
     case ACTION_BACK: {
@@ -300,22 +405,31 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
 };
 
 MenuNode *parse_player_choice(Player *player, char *choice) {
-  if (choice == NULL) {
+  if (choice == NULL || *choice == '\0') {
     return NULL;
   }
+
+  MenuNode *menu_node = NULL;
 
   int choice_int = atoi(choice);
 
-  if (choice_int == 0) {
-    return NULL;
+  if (choice_int > 0 && choice_int <= player->current_menu->options_count) {
+    menu_node = player->current_menu->options[choice_int-1];
+  } else {
+    for (int i = 0; i < player->current_menu->options_count; i++) {
+      MenuNode *current_option = player->current_menu->options[i];
+      if (toupper(*choice) == current_option->key) {
+        menu_node = current_option;
+        break;
+      }
+    }
   }
 
-  MenuNode *menu_node = player->current_menu->options[choice_int-1];
   return menu_node;
 }
 
 int playing(Player *player) {
-  print_text(PRINT_FAST3, "Looping...\n");
+  print_text(PRINT_FAST3, "(Looping...)\n");
   print_text(PRINT_FAST3, "Current Menu: %s\n", player->current_menu->name);
   display_menu(player->current_menu);
   char choice[32];
@@ -330,7 +444,7 @@ int playing(Player *player) {
 
   switch (node_kind) {
     case NODE_MENU: {
-      print_text(PRINT_FAST3, "Menu...\n");
+      print_text(PRINT_FAST3, "Selected: Menu\n");
       MenuKind menu_kind = menu_node->data_kind.menu_kind;
       Menu *new_menu = build_menu(menu_kind, player);
       new_menu->prev_menu = player->current_menu;
@@ -338,7 +452,7 @@ int playing(Player *player) {
       return 1;
     }
     case NODE_ACTION: {
-      print_text(PRINT_FAST3, "Action...\n");
+      print_text(PRINT_FAST3, "Selected: Action\n");
       ActionKind action_kind = menu_node->data_kind.action_kind;
       int result = perform_action(action_kind, player, menu_node);
       return result;

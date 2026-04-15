@@ -148,6 +148,16 @@ const char *direction_to_string(DirectionKind direction_kind) {
   }
 }
 
+char direction_to_char(DirectionKind direction_kind) {
+  switch (direction_kind) {
+    case DIRECTION_NORTH: return 'N';
+    case DIRECTION_EAST: return 'E';
+    case DIRECTION_WEST: return 'W';
+    case DIRECTION_SOUTH: return 'S';
+    default: return '?';
+  }
+}
+
 int add_item_to_room(Room *room, Item *item) {
   if (room == NULL || item == NULL) {
     return ITEM_ADD_TO_ROOM_INVALID;
