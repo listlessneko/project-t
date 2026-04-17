@@ -246,6 +246,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu = menu_malloc(5);
       strncpy(new_menu->name, "Explore Menu", sizeof(new_menu->name) - 1);
       new_menu->name[31] = '\0';
+      print_text(PRINT_FAST3, "%s\n", new_menu->name);
       Room *current_room = player->current_room;
       new_menu->options[0] = build_explore_room_menu_node(DIRECTION_NORTH, current_room->north);
       new_menu->options[1] = build_explore_room_menu_node(DIRECTION_EAST, current_room->east);
@@ -268,7 +269,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       break;
     }
     case MENU_VIEW_INVENTORY: {
-      int item_limit = 4;
+      int item_limit = 5;
       int nav_options = 3;
       int current_item = 0;
       int remaining = player->inventory_count - current_item;
@@ -356,7 +357,7 @@ void destroy_menu(Menu *menu) {
 
 void display_menu(Menu *menu) {
   print_text(PRINT_NORMAL5, "%s\n", menu->name);
-  print_text(PRINT_NORMAL5, "%s\n", menu->description);
+  /*print_text(PRINT_NORMAL5, "%s\n", menu->description);*/
 
   for (int i = 0; i < menu->options_count; i++) {
     MenuNode *menu_node = menu->options[i];
