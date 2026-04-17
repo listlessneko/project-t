@@ -335,6 +335,11 @@ Room *generate_room(Player *player, DirectionKind direction) {
     new_room->enemy = enemy;
   }
 
+  new_room->north = NULL;
+  new_room->east = NULL;
+  new_room->west = NULL;
+  new_room->south = NULL;
+
   if (direction == DIRECTION_NORTH) {
     new_room->south = player->current_room;
   } else if (direction == DIRECTION_EAST) {
