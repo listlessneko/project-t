@@ -58,12 +58,13 @@ typedef struct MenuNode {
 typedef struct Menu {
   char name[64];
   char description[256];
+  char options[1000];
   int is_static;
   struct Menu *prev_menu;
   struct Menu *prev_page;
   struct Menu *next_page;
-  int options_count;
-  MenuNode *options[];
+  int node_count;
+  MenuNode *nodes[];
 } Menu;
 
 extern Menu main_menu;
