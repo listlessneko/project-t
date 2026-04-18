@@ -152,8 +152,8 @@ Menu main_menu = {
   .prev_menu = NULL,
   .prev_page = NULL,
   .next_page = NULL,
-  .options_count = 4,
-  .options = {
+  .node_count = 4,
+  .nodes = {
     &explore_node,
     &view_node,
     &fight_node,
@@ -168,8 +168,8 @@ Menu view_menu = {
   .is_static = 1,
   .prev_page = NULL,
   .next_page = NULL,
-  .options_count = 5,
-  .options = {
+  .node_count = 5,
+  .nodes = {
     &view_room_node,
     &view_inventory_node,
     &view_map_node,
@@ -213,8 +213,8 @@ MenuNode *build_explore_room_menu_node(DirectionKind direction_kind, Room *room)
   return menu_node;
 };
 
-Menu *menu_malloc(int options_count) {
-  Menu *menu = malloc(sizeof(Menu) + sizeof(MenuNode *) * options_count);
+Menu *menu_malloc(int node_count) {
+  Menu *menu = malloc(sizeof(Menu) + sizeof(MenuNode *) * node_count);
   if (menu == NULL) {
     return NULL;
   }
@@ -222,7 +222,7 @@ Menu *menu_malloc(int options_count) {
   menu->next_page = NULL;
   menu->prev_page = NULL;
   menu->is_static = 0;
-  menu->options_count = options_count;
+  menu->node_count = node_count;
   return menu;
 };
 
@@ -248,11 +248,11 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu->name[31] = '\0';
       print_text(PRINT_FAST3, "%s\n", new_menu->name);
       Room *current_room = player->current_room;
-      new_menu->options[0] = build_explore_room_menu_node(DIRECTION_NORTH, current_room->north);
-      new_menu->options[1] = build_explore_room_menu_node(DIRECTION_EAST, current_room->east);
-      new_menu->options[2] = build_explore_room_menu_node(DIRECTION_WEST, current_room->west);
-      new_menu->options[3] = build_explore_room_menu_node(DIRECTION_SOUTH, current_room->south);
-      new_menu->options[4] = &back_node;
+      new_menu->nodes[0] = build_explore_room_menu_node(DIRECTION_NORTH, current_room->north);
+      new_menu->nodes[1] = build_explore_room_menu_node(DIRECTION_EAST, current_room->east);
+      new_menu->nodes[2] = build_explore_room_menu_node(DIRECTION_WEST, current_room->west);
+      new_menu->nodes[3] = build_explore_room_menu_node(DIRECTION_SOUTH, current_room->south);
+      new_menu->nodes[4] = &back_node;
       break;
     }
     case MENU_VIEW: {
@@ -263,9 +263,9 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu = menu_malloc(current_room->items_count + 1);
       int i = 0;
       for (i = 0; i < current_room->items_count; i++) {
-        new_menu->options[i] = build_view_item_menu_node(MENU_VIEW_ROOM_ITEM, current_room->items[i]);
+        new_menu->nodes[i] = build_view_item_menu_node(MENU_VIEW_ROOM_ITEM, current_room->items[i]);
       }
-      new_menu->options[i] = &back_node;
+      new_menu->nodes[i] = &back_node;
       break;
     }
     case MENU_VIEW_INVENTORY: {
@@ -284,12 +284,12 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       Menu *first_page = new_menu;
       int i;
       for (i = 0; i < page_size; i++) {
-        new_menu->options[i] = build_view_item_menu_node(MENU_VIEW_INVENTORY_ITEM, player->inventory[current_item]);
+        new_menu->nodes[i] = build_view_item_menu_node(MENU_VIEW_INVENTORY_ITEM, player->inventory[current_item]);
         current_item++;
       }
-      new_menu->options[i++] = &prev_node;
-      new_menu->options[i++] = &next_node;
-      new_menu->options[i++] = &back_node;
+      new_menu->nodes[i++] = &prev_node;
+      new_menu->nodes[i++] = &next_node;
+      new_menu->nodes[i++] = &back_node;
       new_menu->prev_menu = player->current_menu;
 
       while (current_sub_page < sub_pages) {
@@ -300,12 +300,12 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
         snprintf(next_page->name, sizeof(next_page->name), "Inventory:\n (Page %d of %d)", current_sub_page, sub_pages);
         int j;
         for (j = 0; j < page_size; j++) {
-          next_page->options[j] = build_view_item_menu_node(MENU_VIEW_INVENTORY_ITEM, player->inventory[current_item]);
+          next_page->nodes[j] = build_view_item_menu_node(MENU_VIEW_INVENTORY_ITEM, player->inventory[current_item]);
           current_item++;
         }
-        next_page->options[j++] = &prev_node;
-        next_page->options[j++] = &next_node;
-        next_page->options[j++] = &back_node;
+        next_page->nodes[j++] = &prev_node;
+        next_page->nodes[j++] = &next_node;
+        next_page->nodes[j++] = &back_node;
         next_page->prev_menu = player->current_menu;
         new_menu->next_page = next_page;
         next_page->prev_page = new_menu;
@@ -319,10 +319,11 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
     default: {
       new_menu = menu_malloc(1);
       strncpy(new_menu->name, "Empty Menu", sizeof(new_menu->name) - 1);
-      new_menu->options[0] = &back_node;
+      new_menu->nodes[0] = &back_node;
       break;
     }
   }
+
   return new_menu;
 }
 
@@ -331,8 +332,8 @@ void destroy_menu_pages(Menu *menu, Menu *first_page) {
     return;
   }
 
-  for (int i = 0; i < menu->options_count; i++) {
-    destroy_menu_node(menu->options[i]);
+  for (int i = 0; i < menu->node_count; i++) {
+    destroy_menu_node(menu->nodes[i]);
   }
   
   destroy_menu_pages(menu->next_page, first_page);
@@ -345,8 +346,8 @@ void destroy_menu(Menu *menu) {
     return;
   }
 
-  for (int i = 0; i < menu->options_count; i++) {
-    destroy_menu_node(menu->options[i]);
+  for (int i = 0; i < menu->node_count; i++) {
+    destroy_menu_node(menu->nodes[i]);
   }
 
   if (menu->next_page != NULL) {
@@ -359,10 +360,11 @@ void display_menu(Menu *menu) {
   print_text(PRINT_NORMAL5, "%s\n", menu->name);
   /*print_text(PRINT_NORMAL5, "%s\n", menu->description);*/
 
-  for (int i = 0; i < menu->options_count; i++) {
-    MenuNode *menu_node = menu->options[i];
+  int offset = 0;
+  for (int k = 0; k < menu->node_count; k++) {
+    MenuNode *menu_node = menu->nodes[k];
     if (menu_node->key == '\0') {
-      print_text(PRINT_FAST3, "[%d] %s\n", i+1, menu_node->name);
+      offset += snprintf(menu->options + offset, sizeof(menu->options) - offset, "[%d] %s\n", k+1, menu_node->name);
     } else if (
       menu_node->node_kind == NODE_ACTION && (
       menu_node->data_kind.action_kind == ACTION_NEXT ||
@@ -370,11 +372,13 @@ void display_menu(Menu *menu) {
       menu_node->data_kind.action_kind == ACTION_BACK
       )
     ) {
-      print_text(PRINT_FAST3, "[%c]%s", menu_node->key, menu_node->name+1);
+      offset += snprintf(menu->options + offset, sizeof(menu->options) - offset, "[%c]%s", menu_node->key, menu_node->name+1);
     } else {
-      print_text(PRINT_FAST3, "[%c]%s\n", menu_node->key, menu_node->name+1);
+      offset += snprintf(menu->options + offset, sizeof(menu->options) - offset, "[%c]%s\n", menu_node->key, menu_node->name+1);
     }
   }
+
+  print_text(PRINT_NORMAL5, "%s", menu->options);
   return;
 }
 
@@ -425,11 +429,11 @@ MenuNode *parse_player_choice(Player *player, char *choice) {
 
   int choice_int = atoi(choice);
 
-  if (choice_int > 0 && choice_int <= player->current_menu->options_count) {
-    menu_node = player->current_menu->options[choice_int-1];
+  if (choice_int > 0 && choice_int <= player->current_menu->node_count) {
+    menu_node = player->current_menu->nodes[choice_int-1];
   } else {
-    for (int i = 0; i < player->current_menu->options_count; i++) {
-      MenuNode *current_option = player->current_menu->options[i];
+    for (int i = 0; i < player->current_menu->node_count; i++) {
+      MenuNode *current_option = player->current_menu->nodes[i];
       if (toupper(*choice) == current_option->key) {
         menu_node = current_option;
         break;
