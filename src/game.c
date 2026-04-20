@@ -56,6 +56,9 @@ Player *create_player() {
   Item *triangle_shield = create_item(ITEM_SHIELD, "Triangle Shield", 0, 0, 1);
   add_item_to_player_inventory(player, triangle_shield);
 
+  player->current_room = NULL;
+  player->map = NULL;
+
   initialize_visited_rooms(player);
 
   player->current_menu = &main_menu;
@@ -101,8 +104,10 @@ void start_game(Player *player) {
   print_text(PRINT_NORMAL5, "You've been resting your strained back against a large tree while letting your mind wander off.\n");
   print_text(PRINT_NORMAL5, "The breaking sound of a distant tree branch snaps you back to reality.\n");
   print_text(PRINT_NORMAL5, "You have to keep moving before the sun sets.\n");
+
+  player->map = NULL;
   player->current_room = NULL;
-  player->current_room = build_room(player, -1);
+  player->current_room = build_room(player, DIRECTION_NONE);
   player->visited_rooms->visited[0] = player->current_room;
   player->visited_rooms->count = 1;
   print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);

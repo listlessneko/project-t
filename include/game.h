@@ -35,6 +35,7 @@ typedef struct Player {
   int inventory_count;
   Room *current_room;
   VisitedRooms *visited_rooms;
+  Map *map;
   Menu *current_menu;
 } Player;
 

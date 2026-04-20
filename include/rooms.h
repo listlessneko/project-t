@@ -2,6 +2,9 @@
 
 #include "entities.h"
 
+#define MAX_AREA_WIDTH 11
+#define MAX_AREA_HEIGHT 11
+#define MAX_ROOMS 12
 #define MAX_ROOMS 12
 #define MAX_SAFE_ROOMS 1
 #define MAX_EASY_ROOMS 3
@@ -9,7 +12,12 @@
 #define MAX_HARD_ROOMS 3
 #define MAX_ROOM_ITEMS 3
 
+typedef struct Map {
+  Room *grid[MAX_AREA_WIDTH][MAX_AREA_HEIGHT];
+} Map;
+
 typedef enum DirectionKind {
+  DIRECTION_NONE,
   DIRECTION_NORTH,
   DIRECTION_EAST,
   DIRECTION_WEST,
@@ -40,10 +48,8 @@ typedef struct Room {
   char name[32];
   char description[256];
   RoomKind kind;
-  struct Room *north;
-  struct Room *east;
-  struct Room *west;
-  struct Room *south;
+  int x;
+  int y;
   Enemy *enemy;
   Item *items[MAX_ROOM_ITEMS];
   int items_count;

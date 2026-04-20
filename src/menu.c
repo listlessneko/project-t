@@ -248,10 +248,11 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu->name[31] = '\0';
       print_text(PRINT_FAST3, "%s\n", new_menu->name);
       Room *current_room = player->current_room;
-      new_menu->nodes[0] = build_explore_room_menu_node(DIRECTION_NORTH, current_room->north);
-      new_menu->nodes[1] = build_explore_room_menu_node(DIRECTION_EAST, current_room->east);
-      new_menu->nodes[2] = build_explore_room_menu_node(DIRECTION_WEST, current_room->west);
-      new_menu->nodes[3] = build_explore_room_menu_node(DIRECTION_SOUTH, current_room->south);
+      Map *map = player->map;
+      new_menu->nodes[0] = build_explore_room_menu_node(DIRECTION_NORTH, map->grid[current_room->x][current_room->y + 1]);
+      new_menu->nodes[1] = build_explore_room_menu_node(DIRECTION_EAST, map->grid[current_room->x + 1][current_room->y]);
+      new_menu->nodes[2] = build_explore_room_menu_node(DIRECTION_WEST, map->grid[current_room->x - 1][current_room->y]);
+      new_menu->nodes[3] = build_explore_room_menu_node(DIRECTION_SOUTH, map->grid[current_room->x][current_room->y - 1]);
       new_menu->nodes[4] = &back_node;
       break;
     }
