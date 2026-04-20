@@ -207,7 +207,7 @@ void explore_room(Player *player, DirectionKind direction) {
   if (*next == NULL) {
     if (player->visited_rooms->count < MAX_ROOMS) {
       print_text(PRINT_NORMAL5, "Generating room...\n");
-      *next = generate_room(player, direction);
+      *next = build_room(player, direction);
       player->visited_rooms->visited[(*next)->id] = *next;
       player->visited_rooms->visited[(*next)->id]->visited = 1;
       player->visited_rooms->count++;
@@ -229,7 +229,7 @@ void explore_room(Player *player, DirectionKind direction) {
   }
 }
 
-Room *generate_room(Player *player, DirectionKind direction) {
+Room *build_room(Player *player, DirectionKind direction) {
   Room *new_room;
   if (player->current_room == NULL) {
     new_room = malloc(sizeof(Room));
