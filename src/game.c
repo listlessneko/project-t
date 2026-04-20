@@ -102,7 +102,7 @@ void start_game(Player *player) {
   print_text(PRINT_NORMAL5, "The breaking sound of a distant tree branch snaps you back to reality.\n");
   print_text(PRINT_NORMAL5, "You have to keep moving before the sun sets.\n");
   player->current_room = NULL;
-  player->current_room = generate_room(player, -1);
+  player->current_room = build_room(player, -1);
   player->visited_rooms->visited[0] = player->current_room;
   player->visited_rooms->count = 1;
   print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);
