@@ -2,5 +2,5 @@ build/
 *.o
 project-t
 references/
-notes.md
+NOTES.md
 CLAUDE.md

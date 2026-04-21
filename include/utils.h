@@ -1,3 +1,6 @@
+#pragma once
+
+#define MAX_PRINT_BUFFER 1024
 #define PRINT_VERY_SLOW50 500000
 #define PRINT_SLOW10 100000
 #define PRINT_NORMAL5 50000

@@ -38,8 +38,8 @@ Player *create_player() {
   Item *round_shield = create_item(ITEM_SHIELD, "Round Shield", 0, 0, 1);
   add_item_to_player_inventory(player, round_shield);
 
-  Item *Dagger = create_item(ITEM_WEAPON, "Dagger", 0, 1, 0);
-  add_item_to_player_inventory(player, Dagger);
+  Item *dagger = create_item(ITEM_WEAPON, "Dagger", 0, 1, 0);
+  add_item_to_player_inventory(player, dagger);
 
   Item *rectangle_shield = create_item(ITEM_SHIELD, "Rectangle Shield", 0, 0, 1);
   add_item_to_player_inventory(player, rectangle_shield);
@@ -108,6 +108,7 @@ void start_game(Player *player) {
   player->map = NULL;
   player->current_room = NULL;
   player->current_room = build_room(player, DIRECTION_NONE);
+  player->current_room->visited = 1;
   player->visited_rooms->visited[0] = player->current_room;
   player->visited_rooms->count = 1;
   print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);

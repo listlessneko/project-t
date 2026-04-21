@@ -4,8 +4,10 @@
 #include "utils.h"
 #include "terminal.h"
 
+#define MAX_PRINT_BUFFER 1024
+
 void print_text(int seconds, const char *text, ...) {
-  char buffer[256];
+  char buffer[MAX_PRINT_BUFFER];
   va_list args;
   va_start(args, text);
   vsnprintf(buffer, sizeof(buffer), text, args);

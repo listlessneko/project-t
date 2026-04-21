@@ -26,6 +26,7 @@ typedef enum EnemyKind {
 } EnemyKind;
 
 typedef enum RoomKind {
+  ROOM_BARRIER,
   ROOM_SAFE,
   ROOM_EASY,
   ROOM_NORMAL,

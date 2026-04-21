@@ -1,9 +1,12 @@
 #pragma once
 
 #include "entities.h"
+#include "utils.h"
 
-#define MAX_AREA_WIDTH 11
-#define MAX_AREA_HEIGHT 11
+#define MAX_AREA_WIDTH 10
+#define MAX_AREA_HEIGHT 10
+#define MAX_MAP_SIZE (MAX_AREA_WIDTH * MAX_AREA_HEIGHT + MAX_AREA_HEIGHT + 1)
+#define MAX_MAP_STR_SIZE MAX_PRINT_BUFFER
 #define MAX_ROOMS 12
 #define MAX_ROOMS 12
 #define MAX_SAFE_ROOMS 1
@@ -85,4 +88,3 @@ void explore_room(Player *player, DirectionKind direction);
 Room *build_room(Player *player, DirectionKind direction);
 int add_item_to_room(Room *room, Item *item);
 int remove_item_from_room(Room *room, Item *item);
-void view_map(Player *player);

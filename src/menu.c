@@ -75,7 +75,7 @@ MenuNode fight_node = {
 
 MenuNode pick_up_node = {
   .node_kind = NODE_ACTION,
-  .data_kind.action_kind = ACTION_PICK_UP,
+  .data_kind.action_kind = ACTION_PICK_UP_ITEM,
   .name = { "Pick Up" },
   .description = { "Pick up item." },
   .key = 'E',
@@ -84,7 +84,7 @@ MenuNode pick_up_node = {
 
 MenuNode use_node = {
   .node_kind = NODE_ACTION,
-  .data_kind.action_kind = ACTION_USE,
+  .data_kind.action_kind = ACTION_USE_ITEM,
   .name = { "Use" },
   .description = { "Use item." },
   .key = 'E',
@@ -93,7 +93,7 @@ MenuNode use_node = {
 
 MenuNode drop_node = {
   .node_kind = NODE_ACTION,
-  .data_kind.action_kind = ACTION_DROP,
+  .data_kind.action_kind = ACTION_DROP_ITEM,
   .name = { "Drop" },
   .description = { "Drop item." },
   .key = 'D',
@@ -102,7 +102,7 @@ MenuNode drop_node = {
 
 MenuNode throw_away_node = {
   .node_kind = NODE_ACTION,
-  .data_kind.action_kind = ACTION_THROW_AWAY,
+  .data_kind.action_kind = ACTION_THROW_AWAY_ITEM,
   .name = { "Throw Away" },
   .description = { "Throw away item." },
   .key = 'T',
@@ -111,7 +111,7 @@ MenuNode throw_away_node = {
 
 MenuNode prev_node = {
   .node_kind = NODE_ACTION,
-  .data_kind.action_kind = ACTION_PREVIOUS,
+  .data_kind.action_kind = ACTION_PREVIOUS_PAGE,
   .name = { "Previous " },
   .description = { "Back to previous page." },
   .key = 'P',
@@ -120,7 +120,7 @@ MenuNode prev_node = {
 
 MenuNode next_node = {
   .node_kind = NODE_ACTION,
-  .data_kind.action_kind = ACTION_NEXT,
+  .data_kind.action_kind = ACTION_NEXT_PAGE,
   .name = { "Next " },
   .description = { "Go to next page." },
   .key = 'N',
@@ -129,7 +129,7 @@ MenuNode next_node = {
 
 MenuNode back_node = {
   .node_kind = NODE_ACTION,
-  .data_kind.action_kind = ACTION_BACK,
+  .data_kind.action_kind = ACTION_BACK_MENU,
   .name = { "Back\n" },
   .description = { "Back to previous menu." },
   .key = 'B',
@@ -138,7 +138,7 @@ MenuNode back_node = {
 
 MenuNode quit_node = {
   .node_kind = NODE_ACTION,
-  .data_kind.action_kind = ACTION_QUIT,
+  .data_kind.action_kind = ACTION_QUIT_GAME,
   .name = { "Quit" },
   .description = { "Return to reality." },
   .key = 'Q',
@@ -200,7 +200,7 @@ MenuNode *build_explore_room_menu_node(DirectionKind direction_kind, Room *room)
   }
 
   menu_node->node_kind = NODE_ACTION;
-  menu_node->data_kind.action_kind = ACTION_GO;
+  menu_node->data_kind.action_kind = ACTION_GO_EXPLORE_ROOM;
   menu_node->data.room = room;
   menu_node->action.direction = direction_kind;
   menu_node->key = direction_to_char(direction_kind);
@@ -213,11 +213,64 @@ MenuNode *build_explore_room_menu_node(DirectionKind direction_kind, Room *room)
   return menu_node;
 };
 
+void build_map(Player *player, Menu *menu) {
+  if (player == NULL || menu == NULL) {
+    return;
+  }
+
+  Map *adventure_map = player->map;
+  char map_str[MAX_MAP_STR_SIZE];
+
+  int offset = 0;
+  offset += snprintf(map_str + offset, sizeof(map_str) - offset, "    ");
+  for (int w = 0; w < MAX_AREA_WIDTH; w++) {
+    offset += snprintf(map_str + offset, sizeof(map_str) - offset, " %d  ", w);
+  }
+  offset += snprintf(map_str + offset, sizeof(map_str) - offset, "\n");
+
+  offset += snprintf(map_str + offset, sizeof(map_str) - offset, "    ");
+  for (int h = 0; h < MAX_AREA_HEIGHT; h++) {
+    offset += snprintf(map_str + offset, sizeof(map_str) - offset, "----");
+  }
+  offset += snprintf(map_str + offset, sizeof(map_str) - offset, "\n");
+
+  for (int y = 0; y < MAX_AREA_WIDTH; y++) {
+    offset += snprintf(map_str + offset, sizeof(map_str) - offset, " %d |", y);
+    for (int x = 0; x < MAX_AREA_HEIGHT; x++) {
+      Room *current_room = adventure_map->grid[x][y];
+      char symbol = '?';
+      if (current_room == NULL) {
+        symbol = '?';
+      } else if (current_room->id == player->current_room->id) {
+        symbol = '@';
+      } else if (current_room->items_count > 0 && current_room->visited) {
+        symbol = '!';
+      } else if (current_room->visited) {
+        symbol = '*';
+      } else if (current_room->kind == ROOM_BARRIER) {
+        symbol = '#';
+      }
+      offset += snprintf(map_str + offset, sizeof(map_str) - offset, " %c |", symbol);
+    }
+    offset += snprintf(map_str + offset, sizeof(map_str) - offset, "\n");
+    offset += snprintf(map_str + offset, sizeof(map_str) - offset, "    ");
+    for (int h = 0; h < MAX_AREA_HEIGHT; h++) {
+      offset += snprintf(map_str + offset, sizeof(map_str) - offset, "----");
+    }
+    offset += snprintf(map_str + offset, sizeof(map_str) - offset, "\n");
+  }
+  print_text(PRINT_NORMAL5, "Current Position: %d, %d\n", player->current_room->x, player->current_room->y);
+  print_text(PRINT_NORMAL5, "%s", map_str);
+}
+
 Menu *menu_malloc(int node_count) {
   Menu *menu = malloc(sizeof(Menu) + sizeof(MenuNode *) * node_count);
   if (menu == NULL) {
     return NULL;
   }
+  memset(menu->name, 0, sizeof(menu->name));
+  memset(menu->description, 0, sizeof(menu->description));
+  memset(menu->options, 0, sizeof(menu->options));
   menu->prev_menu = NULL;
   menu->next_page = NULL;
   menu->prev_page = NULL;
@@ -234,7 +287,9 @@ void destroy_menu_node(MenuNode *menu_node) {
 }
 
 Menu *build_menu(MenuKind menu_kind, Player *player) {
-  print_text(PRINT_FAST3, "Building menu...\n");
+  if (player == NULL) {
+    return NULL;
+  }
 
   Menu *new_menu;
 
@@ -244,15 +299,14 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
     }
     case MENU_EXPLORE: {
       new_menu = menu_malloc(5);
-      strncpy(new_menu->name, "Explore Menu", sizeof(new_menu->name) - 1);
+      new_menu->menu_kind = menu_kind;
       new_menu->name[31] = '\0';
-      print_text(PRINT_FAST3, "%s\n", new_menu->name);
       Room *current_room = player->current_room;
       Map *map = player->map;
-      new_menu->nodes[0] = build_explore_room_menu_node(DIRECTION_NORTH, map->grid[current_room->x][current_room->y + 1]);
+      new_menu->nodes[0] = build_explore_room_menu_node(DIRECTION_NORTH, map->grid[current_room->x][current_room->y - 1]);
       new_menu->nodes[1] = build_explore_room_menu_node(DIRECTION_EAST, map->grid[current_room->x + 1][current_room->y]);
       new_menu->nodes[2] = build_explore_room_menu_node(DIRECTION_WEST, map->grid[current_room->x - 1][current_room->y]);
-      new_menu->nodes[3] = build_explore_room_menu_node(DIRECTION_SOUTH, map->grid[current_room->x][current_room->y - 1]);
+      new_menu->nodes[3] = build_explore_room_menu_node(DIRECTION_SOUTH, map->grid[current_room->x][current_room->y + 1]);
       new_menu->nodes[4] = &back_node;
       break;
     }
@@ -262,6 +316,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
     case MENU_VIEW_ROOM: {
       Room *current_room = player->current_room;
       new_menu = menu_malloc(current_room->items_count + 1);
+      new_menu->menu_kind = menu_kind;
       int i = 0;
       for (i = 0; i < current_room->items_count; i++) {
         new_menu->nodes[i] = build_view_item_menu_node(MENU_VIEW_ROOM_ITEM, current_room->items[i]);
@@ -280,6 +335,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
 
       Menu *next_page;
       new_menu = menu_malloc(page_size + nav_options);
+      new_menu->menu_kind = menu_kind;
       snprintf(new_menu->name, sizeof(new_menu->name), "Inventory:\n (Page %d of %d)", current_sub_page, sub_pages);
       new_menu->name[63] = '\0';
       Menu *first_page = new_menu;
@@ -298,6 +354,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
         remaining = player->inventory_count - current_item;
         page_size = remaining > item_limit ? item_limit : remaining;
         next_page = menu_malloc(page_size + nav_options);
+        next_page->menu_kind = menu_kind;
         snprintf(next_page->name, sizeof(next_page->name), "Inventory:\n (Page %d of %d)", current_sub_page, sub_pages);
         int j;
         for (j = 0; j < page_size; j++) {
@@ -317,8 +374,16 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu = first_page;
       break;
     }
+    case MENU_VIEW_MAP: {
+      new_menu = menu_malloc(1);
+      new_menu->menu_kind = menu_kind;
+      strncpy(new_menu->name, "Map", sizeof(new_menu->name) - 1);
+      new_menu->nodes[0] = &back_node;
+      break;
+    }
     default: {
       new_menu = menu_malloc(1);
+      new_menu->menu_kind = menu_kind;
       strncpy(new_menu->name, "Empty Menu", sizeof(new_menu->name) - 1);
       new_menu->nodes[0] = &back_node;
       break;
@@ -336,13 +401,12 @@ void destroy_menu_pages(Menu *menu, Menu *first_page) {
   for (int i = 0; i < menu->node_count; i++) {
     destroy_menu_node(menu->nodes[i]);
   }
-  
+
   destroy_menu_pages(menu->next_page, first_page);
   free(menu);
 }
 
 void destroy_menu(Menu *menu) {
-  print_text(PRINT_FAST3, "Destroying menu: %s\n", menu->name);
   if (menu == NULL || menu->is_static) {
     return;
   }
@@ -357,35 +421,45 @@ void destroy_menu(Menu *menu) {
   free(menu);
 }
 
-void display_menu(Menu *menu) {
+void display_menu(Player *player) {
+  Menu *menu = player->current_menu;
   print_text(PRINT_NORMAL5, "%s\n", menu->name);
   /*print_text(PRINT_NORMAL5, "%s\n", menu->description);*/
 
-  int offset = 0;
-  for (int k = 0; k < menu->node_count; k++) {
-    MenuNode *menu_node = menu->nodes[k];
-    if (menu_node->key == '\0') {
-      offset += snprintf(menu->options + offset, sizeof(menu->options) - offset, "[%d] %s\n", k+1, menu_node->name);
-    } else if (
-      menu_node->node_kind == NODE_ACTION && (
-      menu_node->data_kind.action_kind == ACTION_NEXT ||
-      menu_node->data_kind.action_kind == ACTION_PREVIOUS ||
-      menu_node->data_kind.action_kind == ACTION_BACK
-      )
-    ) {
-      offset += snprintf(menu->options + offset, sizeof(menu->options) - offset, "[%c]%s", menu_node->key, menu_node->name+1);
-    } else {
-      offset += snprintf(menu->options + offset, sizeof(menu->options) - offset, "[%c]%s\n", menu_node->key, menu_node->name+1);
+  MenuKind menu_kind = menu->menu_kind;
+  switch (menu_kind) {
+    case MENU_VIEW_MAP: {
+      build_map(player, menu);
+    }
+    default: {
+      int offset = 0;
+      for (int k = 0; k < menu->node_count; k++) {
+        MenuNode *menu_node = menu->nodes[k];
+        if (menu_node->key == '\0') {
+          offset += snprintf(menu->options + offset, sizeof(menu->options) - offset, "[%d] %s\n", k+1, menu_node->name);
+        } else if (
+          menu_node->node_kind == NODE_ACTION && (
+          menu_node->data_kind.action_kind == ACTION_NEXT_PAGE ||
+          menu_node->data_kind.action_kind == ACTION_PREVIOUS_PAGE ||
+          menu_node->data_kind.action_kind == ACTION_BACK_MENU
+        )
+        ) {
+          offset += snprintf(menu->options + offset, sizeof(menu->options) - offset, "[%c]%s", menu_node->key, menu_node->name+1);
+        } else {
+          offset += snprintf(menu->options + offset, sizeof(menu->options) - offset, "[%c]%s\n", menu_node->key, menu_node->name+1);
+        }
+      }
+      print_text(PRINT_NORMAL5, "%s", menu->options);
+      break;
     }
   }
 
-  print_text(PRINT_NORMAL5, "%s", menu->options);
   return;
 }
 
 int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
   switch (action_kind) {
-    case ACTION_GO: {
+    case ACTION_GO_EXPLORE_ROOM: {
       explore_room(player, choice->action.direction);
       destroy_menu(player->current_menu);
       Menu *new_menu = build_menu(MENU_EXPLORE, player);
@@ -397,21 +471,21 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
     /*case ACTION_USE:*/
     /*case ACTION_DROP:*/
     /*case ACTION_THROW_AWAY:*/
-    case ACTION_PREVIOUS: {
+    case ACTION_PREVIOUS_PAGE: {
       player->current_menu = player->current_menu->prev_page;
       return 1;
     }
-    case ACTION_NEXT: {
+    case ACTION_NEXT_PAGE: {
       player->current_menu = player->current_menu->next_page;
       return 1;
     }
-    case ACTION_BACK: {
+    case ACTION_BACK_MENU: {
       Menu *temp = player->current_menu;
       player->current_menu = player->current_menu->prev_menu;
       destroy_menu(temp);
       return 1;
     }
-    case ACTION_QUIT: {
+    case ACTION_QUIT_GAME: {
       print_text(PRINT_NORMAL5, "You open your eyes and realize it was just a dream.\n");
       return 0;
     }
@@ -447,7 +521,7 @@ MenuNode *parse_player_choice(Player *player, char *choice) {
 
 int playing(Player *player) {
   print_text(PRINT_FAST3, "(Looping...)\n");
-  display_menu(player->current_menu);
+  display_menu(player);
   char choice[32];
   read_input(choice, sizeof(choice));
   print_text(PRINT_FAST3, "Choice: %s\n", choice);

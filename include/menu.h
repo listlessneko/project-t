@@ -23,15 +23,15 @@ typedef enum MenuKind {
 } MenuKind;
 
 typedef enum ActionKind {
-  ACTION_GO,
-  ACTION_PICK_UP,
-  ACTION_USE,
-  ACTION_DROP,
-  ACTION_THROW_AWAY,
-  ACTION_PREVIOUS,
-  ACTION_NEXT,
-  ACTION_BACK,
-  ACTION_QUIT,
+  ACTION_GO_EXPLORE_ROOM,
+  ACTION_PICK_UP_ITEM,
+  ACTION_USE_ITEM,
+  ACTION_DROP_ITEM,
+  ACTION_THROW_AWAY_ITEM,
+  ACTION_PREVIOUS_PAGE,
+  ACTION_NEXT_PAGE,
+  ACTION_BACK_MENU,
+  ACTION_QUIT_GAME,
 } ActionKind;
 
 typedef struct MenuNode {
@@ -56,6 +56,7 @@ typedef struct MenuNode {
 } MenuNode;
 
 typedef struct Menu {
+  MenuKind menu_kind;
   char name[64];
   char description[256];
   char options[1000];
@@ -73,5 +74,5 @@ int playing(Player *player);
 MenuNode *build_menu_node(NodeKind node_kind, void *data);
 MenuNode *build_room_menu_node(DirectionKind direction_kind, Room *room);
 Menu *menu_realloc(Menu *menu, int count);
-void display_menu(Menu *menu);
+void display_menu(Player *player);
 MenuNode *parse_player_choice(Player *player, char *choice);

@@ -197,18 +197,17 @@ void explore_room(Player *player, DirectionKind direction) {
   int current_x = player->current_room->x;
   int current_y = player->current_room->y;
   if (direction == DIRECTION_NORTH) {
-    next = &player->map->grid[current_x][current_y + 1];
+    next = &player->map->grid[current_x][current_y - 1];
   } else if (direction == DIRECTION_EAST) {
     next = &player->map->grid[current_x + 1][current_y];
   } else if (direction == DIRECTION_WEST) {
     next = &player->map->grid[current_x - 1][current_y];
   } else if (direction == DIRECTION_SOUTH) {
-    next = &player->map->grid[current_x][current_y - 1];
+    next = &player->map->grid[current_x][current_y + 1];
   }
 
   if (*next == NULL) {
     if (player->visited_rooms->count < MAX_ROOMS) {
-      print_text(PRINT_NORMAL5, "Generating room...\n");
       *next = build_room(player, direction);
       player->visited_rooms->visited[(*next)->id] = *next;
       player->visited_rooms->visited[(*next)->id]->visited = 1;
@@ -222,12 +221,12 @@ void explore_room(Player *player, DirectionKind direction) {
   }
   if (player->current_room->kind == ROOM_SAFE) {
     print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);
-    print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
+    // print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
   } else {
     print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);
-    print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
-    print_text(PRINT_NORMAL5, "You see a %s\n", player->current_room->enemy->name);
-    print_text(PRINT_NORMAL5, "Health: %d\n", player->current_room->enemy->health);
+    // print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
+    // print_text(PRINT_NORMAL5, "You see a %s\n", player->current_room->enemy->name);
+    // print_text(PRINT_NORMAL5, "Health: %d\n", player->current_room->enemy->health);
   }
 }
 
@@ -270,7 +269,7 @@ Room *build_room(Player *player, DirectionKind direction) {
         max_room_kind = MAX_HARD_ROOMS;
         room_kind_count = room_kind_counter.hard;
         break;
-      case ROOM_UNKNOWN:
+      default:
         return NULL;
     }
 
@@ -289,7 +288,7 @@ Room *build_room(Player *player, DirectionKind direction) {
         case ROOM_HARD:
           max_room_kind = MAX_HARD_ROOMS;
           break;
-        case ROOM_UNKNOWN:
+        default:
           return NULL;
       }
     }
@@ -324,7 +323,7 @@ Room *build_room(Player *player, DirectionKind direction) {
         fateful_room_appearance = hard_room_appearance_templates[room_kind_counter.hard - 1];
         fateful_room_contents = hard_room_contents_templates[0];
         break;
-      case ROOM_UNKNOWN:
+      default:
         return NULL;
     }
 
@@ -344,39 +343,39 @@ Room *build_room(Player *player, DirectionKind direction) {
     }
     player->map = new_map;
     new_room->x = rand() % MAX_AREA_WIDTH;
-    print_text(PRINT_FAST3, "x: [%d]\n", new_room->x);
     new_room->y = rand() % MAX_AREA_HEIGHT;
-    print_text(PRINT_FAST3, "y: [%d]\n", new_room->y);
     player->map->grid[new_room->x][new_room->y] = new_room;
   }
 
   switch (direction) {
     case DIRECTION_NORTH: {
       new_room->x = player->current_room->x;
-      new_room->y = player->current_room->y + 1;
-      player->map->grid[new_room->x][new_room->y] = new_room;
+      new_room->y = player->current_room->y - 1;
+      break;
     }
     case DIRECTION_EAST: {
       new_room->x = player->current_room->x + 1;
       new_room->y = player->current_room->y;
-      player->map->grid[new_room->x][new_room->y] = new_room;
+      break;
     }
     case DIRECTION_WEST:{
       new_room->x = player->current_room->x - 1;
       new_room->y = player->current_room->y;
-      player->map->grid[new_room->x][new_room->y] = new_room;
+      break;
     }
     case DIRECTION_SOUTH: {
       new_room->x = player->current_room->x;
-      new_room->y = player->current_room->y - 1;
-      player->map->grid[new_room->x][new_room->y] = new_room;
+      new_room->y = player->current_room->y + 1;
+      break;
     }
     default:
       break;
   }
 
+  player->map->grid[new_room->x][new_room->y] = new_room;
   new_room->id = player->visited_rooms->count;
   new_room->visited = 0;
 
   return new_room;
 }
+
