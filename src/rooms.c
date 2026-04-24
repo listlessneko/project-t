@@ -196,14 +196,18 @@ void explore_room(Player *player, DirectionKind direction) {
   Room **next = NULL;
   int current_x = player->current_room->x;
   int current_y = player->current_room->y;
-  if (direction == DIRECTION_NORTH) {
+
+  if (direction == DIRECTION_NORTH && current_y > 0) {
     next = &player->map->grid[current_x][current_y - 1];
-  } else if (direction == DIRECTION_EAST) {
+  } else if (direction == DIRECTION_EAST && current_x < MAX_AREA_WIDTH - 1) {
     next = &player->map->grid[current_x + 1][current_y];
-  } else if (direction == DIRECTION_WEST) {
+  } else if (direction == DIRECTION_WEST && current_x > 0) {
     next = &player->map->grid[current_x - 1][current_y];
-  } else if (direction == DIRECTION_SOUTH) {
+  } else if (direction == DIRECTION_SOUTH && current_y < MAX_AREA_HEIGHT - 1) {
     next = &player->map->grid[current_x][current_y + 1];
+  } else {
+    print_text(PRINT_NORMAL5, "Let's not stray too far from the path.\n");
+    return;
   }
 
   if (*next == NULL) {
@@ -215,6 +219,7 @@ void explore_room(Player *player, DirectionKind direction) {
       player->current_room = *next;
     } else {
       print_text(PRINT_NORMAL5, "You've reached a dead end. Somehow...\n");
+      return;
     }
   } else {
     player->current_room = *next;
@@ -222,11 +227,13 @@ void explore_room(Player *player, DirectionKind direction) {
   if (player->current_room->kind == ROOM_SAFE) {
     print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);
     // print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
+    return;
   } else {
     print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);
     // print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
     // print_text(PRINT_NORMAL5, "You see a %s\n", player->current_room->enemy->name);
     // print_text(PRINT_NORMAL5, "Health: %d\n", player->current_room->enemy->health);
+    return;
   }
 }
 

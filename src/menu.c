@@ -303,10 +303,16 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu->name[31] = '\0';
       Room *current_room = player->current_room;
       Map *map = player->map;
-      new_menu->nodes[0] = build_explore_room_menu_node(DIRECTION_NORTH, map->grid[current_room->x][current_room->y - 1]);
-      new_menu->nodes[1] = build_explore_room_menu_node(DIRECTION_EAST, map->grid[current_room->x + 1][current_room->y]);
-      new_menu->nodes[2] = build_explore_room_menu_node(DIRECTION_WEST, map->grid[current_room->x - 1][current_room->y]);
-      new_menu->nodes[3] = build_explore_room_menu_node(DIRECTION_SOUTH, map->grid[current_room->x][current_room->y + 1]);
+
+      Room *north_room = current_room->y - 1 < 0 ? NULL : map->grid[current_room->x][current_room->y - 1];
+      Room *east_room = current_room->x + 1 >= MAX_AREA_WIDTH ? NULL : map->grid[current_room->x + 1][current_room->y];
+      Room *west_room = current_room->x - 1 < 0 ? NULL : map->grid[current_room->x - 1][current_room->y];
+      Room *south_room = current_room->y + 1 >= MAX_AREA_HEIGHT ? NULL : map->grid[current_room->x][current_room->y + 1];
+
+      new_menu->nodes[0] = build_explore_room_menu_node(DIRECTION_NORTH, north_room);
+      new_menu->nodes[1] = build_explore_room_menu_node(DIRECTION_EAST, east_room);
+      new_menu->nodes[2] = build_explore_room_menu_node(DIRECTION_WEST, west_room);
+      new_menu->nodes[3] = build_explore_room_menu_node(DIRECTION_SOUTH, south_room);
       new_menu->nodes[4] = &back_node;
       break;
     }
