@@ -5,6 +5,7 @@
 
 typedef enum NodeKind {
   NODE_MENU,
+  NODE_MENU_ITEM,
   NODE_ACTION,
 } NodeKind;
 
@@ -40,8 +41,8 @@ typedef struct MenuNode {
     MenuKind menu_kind;
     ActionKind action_kind;
   } data_kind;
-  char name[64];
-  char description[256];
+  char name[128];
+  char description[512];
   char key;
   int is_static;
   union {
@@ -57,8 +58,8 @@ typedef struct MenuNode {
 
 typedef struct Menu {
   MenuKind menu_kind;
-  char name[64];
-  char description[256];
+  char name[128];
+  char description[516];
   char options[1000];
   int is_static;
   struct Menu *prev_menu;
