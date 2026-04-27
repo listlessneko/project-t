@@ -37,64 +37,6 @@ int remove_item_from_player_inventory(Player *player, Item *item) {
   return ITEM_REMOVE_FROM_INVENTORY_ERROR;
 }
 
-int equip_item(Player *player, Item *item) {
-  if (player == NULL || item == NULL) {
-    return ITEM_EQUIP_INVALID;
-  }
-
-  switch (item->kind) {
-    case ITEM_WEAPON:
-      if (player->weapon == NULL) {
-        player->weapon = item;
-        return ITEM_EQUIP_SUCCESS;
-      } else {
-        return ITEM_SLOT_ALREADY_EQUIPPED;
-      }
-    case ITEM_SHIELD:
-      player->shield = item;
-      return ITEM_EQUIP_SUCCESS;
-    case ITEM_POTION:
-      return ITEM_EQUIP_INVALID;
-    case ITEM_ACCESSORY:
-      player->accessory = item;
-      return ITEM_EQUIP_SUCCESS;
-    default:
-      return ITEM_EQUIP_ERROR;
-  }
-}
-
-int unequip_item(Player *player, Item *item) {
-  return ITEM_UNEQUIP_INVALID;
-}
-
-
-int use_item(Player *player, Item *item) {
-  if (player == NULL || item == NULL) {
-    return ITEM_USE_INVALID;
-  }
-
-  switch (item->kind) {
-    case ITEM_WEAPON:
-    case ITEM_SHIELD:
-      return ITEM_USE_INVALID;
-    case ITEM_POTION: {
-      int health_regained = player->health + item->data.potion.health_bonus;
-      int max_health = player->max_health;
-      player->health = health_regained > max_health ? max_health : health_regained;
-
-      player->attack += item->data.potion.attack_bonus;
-      player->defense += item->data.potion.defense_bonus;
-
-      destroy_item(item);
-      return ITEM_USE_SUCCESS;
-    }
-    case ITEM_ACCESSORY:
-      return ITEM_USE_INVALID;
-    default:
-      return ITEM_USE_ERROR;
-  }
-}
-
 void discard_item(Player *player, Item *item) {
   return;
 }

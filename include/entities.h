@@ -37,8 +37,8 @@ typedef enum RoomKind {
 typedef enum ItemKind {
   ITEM_WEAPON,
   ITEM_SHIELD,
-  ITEM_POTION,
   ITEM_ACCESSORY,
+  ITEM_POTION,
   ITEM_UNKNOWN,
 } ItemKind;
 

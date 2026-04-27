@@ -33,12 +33,10 @@ typedef struct Item {
     Potion potion;
     Accessory accessory;
   } data;
-  union {
-    Room *room;
-    Player *player;
-  } owner;
-  EntityKind owner_entity_kind;
 } Item;
 
 Item *create_item(ItemKind kind, char *name, int health_bonus, int attack_bonus, int defense_bonus);
+int equip_item(Player *player, Item *item);
+int unequip_item(Player *player, Item *item);
+int use_item(Player *player, Item *item);
 void destroy_item(Item *item);

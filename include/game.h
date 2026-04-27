@@ -4,6 +4,8 @@
 #include "menu.h"
 #include "rooms.h"
 
+#define MAX_INVENTORY_SIZE 12
+
 typedef struct Enemy {
   EntityKind entity_kind;
   int id;
@@ -31,7 +33,7 @@ typedef struct Player {
   Item *weapon;
   Item *shield;
   Item *accessory;
-  Item *inventory[12];
+  Item *inventory[MAX_INVENTORY_SIZE];
   int inventory_count;
   Room *current_room;
   VisitedRooms *visited_rooms;

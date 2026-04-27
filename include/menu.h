@@ -26,6 +26,8 @@ typedef enum MenuKind {
 typedef enum ActionKind {
   ACTION_GO_EXPLORE_ROOM,
   ACTION_PICK_UP_ITEM,
+  ACTION_EQUIP_ITEM,
+  ACTION_UNEQUIP_ITEM,
   ACTION_USE_ITEM,
   ACTION_DROP_ITEM,
   ACTION_THROW_AWAY_ITEM,
@@ -65,6 +67,7 @@ typedef struct Menu {
   struct Menu *prev_menu;
   struct Menu *prev_page;
   struct Menu *next_page;
+  Item *item;
   int node_count;
   MenuNode *nodes[];
 } Menu;
