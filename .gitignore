@@ -1,6 +1,7 @@
 build/
 *.o
 project-t
+compile_commands.json
 references/
 NOTES.md
 CLAUDE.md
