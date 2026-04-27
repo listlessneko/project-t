@@ -5,10 +5,6 @@
 #include "items.h"
 #include "inventory.h"
 
-void view_inventory(Player *player) {
-  return;
-}
-
 int add_item_to_player_inventory(Player *player, Item *item) {
   if (player == NULL || item == NULL) {
     return ITEM_ADD_TO_INVENTORY_INVALID;
@@ -35,8 +31,4 @@ int remove_item_from_player_inventory(Player *player, Item *item) {
     }
   }
   return ITEM_REMOVE_FROM_INVENTORY_ERROR;
-}
-
-void discard_item(Player *player, Item *item) {
-  return;
 }

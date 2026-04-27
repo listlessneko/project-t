@@ -54,6 +54,8 @@ Item *create_item(ItemKind kind, char *name, int health_bonus, int attack_bonus,
       new_item->data.potion.attack_bonus = attack_bonus;
       new_item->data.potion.defense_bonus = defense_bonus;
       break;
+    default:
+      break;
   }
 
   return new_item;
@@ -155,6 +157,22 @@ int use_item(Player *player, Item *item) {
     default:
       return ITEM_USE_ERROR;
   }
+}
+
+int swap_items(Player *player, Item **item_a, Item *item_b) {
+  if (player == NULL || item_a == NULL || item_b == NULL) {
+    return ITEM_SWAP_INVALID;
+  }
+
+  for (int i = 0; i < player->inventory_count; i++) {
+    if (player->inventory[i]->id == item_b->id) {
+      Item *temp = player->inventory[i];
+      player->inventory[i] = *item_a;
+      *item_a = temp;
+      return ITEM_SWAP_SUCCESS;
+    }
+  }
+  return ITEM_SWAP_ERROR;
 }
 
 void destroy_item(Item *item) {

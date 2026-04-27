@@ -25,11 +25,9 @@ Player *create_player() {
   player->inventory_count = 0;
 
   Item *sword = create_item(ITEM_WEAPON, "Sword", 0, 1, 0);
-  add_item_to_player_inventory(player, sword);
   equip_item(player, sword);
 
   Item *shield = create_item(ITEM_SHIELD, "Shield", 0, 0, 1);
-  add_item_to_player_inventory(player, shield);
   equip_item(player, shield);
 
   Item *axe = create_item(ITEM_WEAPON, "Axe", 0, 1, 0);

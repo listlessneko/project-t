@@ -35,8 +35,10 @@ typedef struct Item {
   } data;
 } Item;
 
+const char *item_kind_name(ItemKind kind);
 Item *create_item(ItemKind kind, char *name, int health_bonus, int attack_bonus, int defense_bonus);
 int equip_item(Player *player, Item *item);
 int unequip_item(Player *player, Item *item);
 int use_item(Player *player, Item *item);
+int swap_items(Player *player, Item **item_a, Item *item_b);
 void destroy_item(Item *item);
