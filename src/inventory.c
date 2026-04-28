@@ -20,15 +20,22 @@ int remove_item_from_player_inventory(Player *player, Item *item) {
     return ITEM_REMOVE_FROM_INVENTORY_INVALID;
   }
 
+  int index = -1;
   for (int i = 0; i < player->inventory_count; i++) {
     if (player->inventory[i]->id == item->id) {
-      if (i != player->inventory_count-1) {
-        player->inventory[i] = player->inventory[player->inventory_count-1];
-      }
-      player->inventory[player->inventory_count-1] = NULL;
-      player->inventory_count--;
-      return ITEM_REMOVE_FROM_INVENTORY_SUCCESS;
+      index = i;
+      break;
     }
+  }
+
+  if (index > -1) {
+    int j;
+    for (j = index; j < player->inventory_count-1; j++) {
+      player->inventory[j] = player->inventory[j+1];
+    }
+    player->inventory[j] = NULL;
+    player->inventory_count--;
+    return ITEM_REMOVE_FROM_INVENTORY_SUCCESS;
   }
   return ITEM_REMOVE_FROM_INVENTORY_ERROR;
 }

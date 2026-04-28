@@ -176,20 +176,24 @@ int remove_item_from_room(Room *room, Item *item) {
     return ITEM_ADD_TO_ROOM_INVALID;
   }
 
+  int index = -1;
   for (int i = 0; i < room->items_count; i++) {
     if (room->items[i]->id == item->id) {
-      if (i != room->items_count-1) {
-        room->items[i] = room->items[room->items_count-1];
-      }
-      room->items[room->items_count-1] = NULL;
-      room->items_count--;
-      return ITEM_REMOVE_FROM_ROOM_SUCCESS;
+      index = i;
+      break;
     }
   }
 
-  room->items[room->items_count] = item;
-  room->items_count++;
-  return ITEM_ADD_TO_ROOM_SUCCESS;
+  if (index > -1) {
+    int j;
+    for (j = index; j < room->items_count; j++) {
+      room->items[j] = room->items[j+1];
+    }
+    room->items[j] = NULL;
+    room->items_count--;
+    return ITEM_REMOVE_FROM_ROOM_SUCCESS;
+  }
+  return ITEM_REMOVE_FROM_INVENTORY_ERROR;
 }
 
 void explore_room(Player *player, DirectionKind direction) {
