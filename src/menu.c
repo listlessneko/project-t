@@ -120,6 +120,15 @@ MenuNode unequip_node = {
   .is_static = 1,
 };
 
+MenuNode swap_node = {
+  .node_kind = NODE_ACTION,
+  .data_kind.action_kind = ACTION_SWAP_EQUIPMENT,
+  .name = { "Swap" },
+  .description = { "Swap equipment." },
+  .key = 'S',
+  .is_static = 1,
+};
+
 MenuNode drop_node = {
   .node_kind = NODE_ACTION,
   .data_kind.action_kind = ACTION_DROP_ITEM,
@@ -162,6 +171,24 @@ MenuNode back_node = {
   .name = { "Back\n" },
   .description = { "Back to previous menu." },
   .key = 'B',
+  .is_static = 1,
+};
+
+MenuNode yes_node = {
+  .node_kind = NODE_ACTION,
+  .data_kind.action_kind = ACTION_YES,
+  .name = { "Yes" },
+  .description = { "Confirm action." },
+  .key = 'Y',
+  .is_static = 1,
+};
+
+MenuNode no_node = {
+  .node_kind = NODE_ACTION,
+  .data_kind.action_kind = ACTION_NO,
+  .name = { "No" },
+  .description = { "Back to previous menu." },
+  .key = 'N',
   .is_static = 1,
 };
 
@@ -441,12 +468,92 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu->nodes[3] = &back_node;
       break;
     }
+    case MENU_FIND_INVENTORY_ITEM_TO_SWAP: {
+      new_menu = menu_malloc(2);
+      new_menu->menu_kind = menu_kind;
+      strncpy(new_menu->name, "Inventory Full", sizeof(new_menu->name) - 1);
+      new_menu->name[127] = '\0';
+      strncpy(new_menu->description, "Find an inventory item to swap with.", sizeof(new_menu->description) - 1);
+      new_menu->description[515] = '\0';
+
+      MenuNode *yes_node = malloc(sizeof(MenuNode));
+      yes_node->node_kind = NODE_MENU;
+      yes_node->data_kind.menu_kind = MENU_SWAP_VIEW_INVENTORY;
+      strncpy(yes_node->name, "Yes", sizeof(yes_node->name) - 1);
+      yes_node->name[127] = '\0';
+      yes_node->key = 'Y';
+
+      new_menu->nodes[0] = yes_node;
+      new_menu->nodes[1] = &no_node;
+      break;
+    }
+    case MENU_SWAP_VIEW_INVENTORY: {
+      int item_limit = 5;
+      int nav_options = 3;
+      int current_item = 0;
+      int **filtered_count = 0;
+      Item **filtered = filtered_inventory(player, player->current_menu->item->kind, *filtered_count);
+      int remaining = **filtered_count - current_item;
+      int page_size = remaining > item_limit ? item_limit : remaining;
+      int sub_pages = (**filtered_count + item_limit - 1) / item_limit;
+      int current_sub_page = 1;
+
+      Menu *next_page;
+      new_menu = menu_malloc(page_size + nav_options);
+      new_menu->menu_kind = menu_kind;
+      snprintf(new_menu->name, sizeof(new_menu->name), "Inventory:\n (Page %d of %d)", current_sub_page, sub_pages);
+      new_menu->name[63] = '\0';
+      Menu *first_page = new_menu;
+      int i;
+      for (i = 0; i < page_size; i++) {
+        new_menu->nodes[i] = build_view_item_menu_node(MENU_SWAP_WITH_EQUIPPED_ITEM, filtered[current_item]);
+        current_item++;
+      }
+      new_menu->nodes[i++] = &prev_node;
+      new_menu->nodes[i++] = &next_node;
+      new_menu->nodes[i++] = &back_node;
+      new_menu->prev_menu = player->current_menu->prev_menu->prev_menu;
+
+      while (current_sub_page < sub_pages) {
+        current_sub_page++;
+        remaining = **filtered_count - current_item;
+        page_size = remaining > item_limit ? item_limit : remaining;
+        next_page = menu_malloc(page_size + nav_options);
+        next_page->menu_kind = menu_kind;
+        snprintf(next_page->name, sizeof(next_page->name), "Inventory:\n (Page %d of %d)", current_sub_page, sub_pages);
+        int j;
+        for (j = 0; j < page_size; j++) {
+          next_page->nodes[j] = build_view_item_menu_node(MENU_SWAP_WITH_EQUIPPED_ITEM, filtered[current_item]);
+          current_item++;
+        }
+        next_page->nodes[j++] = &prev_node;
+        next_page->nodes[j++] = &next_node;
+        next_page->nodes[j++] = &back_node;
+        next_page->prev_menu = player->current_menu;
+        new_menu->next_page = next_page;
+        next_page->prev_page = new_menu;
+        new_menu = next_page;
+      }
+      new_menu->next_page = first_page;
+      first_page->prev_page = new_menu;
+      new_menu = first_page;
+      break;
+    }
     case MENU_VIEW_MAP: {
       new_menu = menu_malloc(1);
       new_menu->menu_kind = menu_kind;
       strncpy(new_menu->name, "Map", sizeof(new_menu->name) - 1);
       new_menu->nodes[0] = &back_node;
       break;
+    }
+    case MENU_CONFIRM: {
+      new_menu = menu_malloc(2);
+
+      strncpy(new_menu->name, "Confirm?", sizeof(new_menu->name)-1);
+      new_menu->name[127] = '\0';
+      new_menu->menu_kind = menu_kind;
+      new_menu->nodes[0] = &yes_node;
+      new_menu->nodes[1] = &no_node;
     }
     default: {
       new_menu = menu_malloc(1);
@@ -464,17 +571,29 @@ Menu *build_item_menu(MenuKind menu_kind, Item *item) {
 
   switch (menu_kind) {
     case MENU_VIEW_ROOM_ITEM: {
-      int node_count = 3;
-      new_menu = menu_malloc(node_count);
+      new_menu = menu_malloc(3);
       snprintf(new_menu->name, sizeof(new_menu->name), "%s", item->name);
       snprintf(new_menu->description, sizeof(new_menu->description), "%s", item->description);
       new_menu->menu_kind = menu_kind;
-      new_menu->node_count = node_count;
-      new_menu->is_static = 0;
+
       new_menu->nodes[0] = &pick_up_node;
       new_menu->nodes[1] = &use_node;
       new_menu->nodes[2] = &back_node;
       break;
+    }
+    case MENU_SWAP_WITH_INVENTORY_ITEM: {
+      new_menu = menu_malloc(2);
+      strncpy(new_menu->name, "Swap with this item?", sizeof(new_menu->name) - 1);
+      new_menu->name[127] = '\0';
+
+      MenuNode *yes_node = malloc(sizeof(MenuNode));
+      yes_node->node_kind = NODE_ACTION;
+      yes_node->data_kind.action_kind = ACTION_YES;
+      strncpy(yes_node->name, "Yes", sizeof(yes_node->name) - 1);
+      yes_node->key = 'Y';
+
+      new_menu->nodes[0] = yes_node;
+      new_menu->nodes[1] = &no_node;
     }
     case MENU_VIEW_INVENTORY_ITEM: {
 
@@ -482,14 +601,11 @@ Menu *build_item_menu(MenuKind menu_kind, Item *item) {
         case ITEM_WEAPON:
         case ITEM_SHIELD:
         case ITEM_ACCESSORY: {
-          int node_count = 4;
-          new_menu = menu_malloc(node_count);
+          new_menu = menu_malloc(4);
           new_menu->item = item;
           snprintf(new_menu->name, sizeof(new_menu->name), "%s", item->name);
           snprintf(new_menu->description, sizeof(new_menu->description), "%s", item->description);
           new_menu->menu_kind = menu_kind;
-          new_menu->node_count = node_count;
-          new_menu->is_static = 0;
 
           new_menu->nodes[0] = &equip_node;
           new_menu->nodes[1] = &drop_node;
@@ -498,14 +614,11 @@ Menu *build_item_menu(MenuKind menu_kind, Item *item) {
           break;
         }
         case ITEM_POTION: {
-          int node_count = 4;
-          new_menu = menu_malloc(node_count);
+          new_menu = menu_malloc(4);
           new_menu->item = item;
           snprintf(new_menu->name, sizeof(new_menu->name), "%s", item->name);
           snprintf(new_menu->description, sizeof(new_menu->description), "%s", item->description);
           new_menu->menu_kind = menu_kind;
-          new_menu->node_count = node_count;
-          new_menu->is_static = 0;
 
           new_menu->nodes[0] = &use_node;
           new_menu->nodes[1] = &drop_node;
@@ -530,19 +643,18 @@ Menu *build_item_menu(MenuKind menu_kind, Item *item) {
         print_text(PRINT_FAST3, "You're grasping at air.\n");
         break;
       }
-      int node_count = 2;
-      new_menu = menu_malloc(node_count);
+      new_menu = menu_malloc(2);
       new_menu->item = item;
       snprintf(new_menu->name, sizeof(new_menu->name), "%s", item->name);
       snprintf(new_menu->description, sizeof(new_menu->description), "%s", item->description);
       new_menu->menu_kind = menu_kind;
-      new_menu->nodes[0] = &unequip_node;
-      new_menu->nodes[1] = &back_node;
+      new_menu->nodes[0] = &swap_node;
+      new_menu->nodes[1] = &unequip_node;
+      new_menu->nodes[2] = &back_node;
       break;
     }
     case MENU_VIEW_UNEQUIPPED_ITEM: {
-      int node_count = 2;
-      new_menu = menu_malloc(node_count);
+      new_menu = menu_malloc(2);
       new_menu->item = item;
       snprintf(new_menu->name, sizeof(new_menu->name), "%s", item->name);
       snprintf(new_menu->description, sizeof(new_menu->description), "%s", item->description);
@@ -666,17 +778,36 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
     }
     case ACTION_EQUIP_ITEM: {
       int equipped_item = equip_item(player, current_item);
-      if (equipped_item == ITEM_EQUIP_INVALID || equipped_item == ITEM_EQUIP_ERROR) {
-        print_text(PRINT_NORMAL5, "Unable to equip item\n");
-      } else if (equipped_item == ITEM_EQUIP_SUCCESS) {
-        int removed_from_inventory = remove_item_from_player_inventory(player, current_item);
-        if (removed_from_inventory == ITEM_REMOVE_FROM_INVENTORY_INVALID || removed_from_inventory == ITEM_REMOVE_FROM_INVENTORY_ERROR) {
-          unequip_item(player, current_item);
-          print_text(PRINT_NORMAL5, "Unable to remove item from inventory\n");
+
+      switch (equipped_item) {
+        case ITEM_EQUIP_INVALID:
+        case ITEM_EQUIP_ERROR:
+          print_text(PRINT_NORMAL5, "Unable to equip item\n");
+          break;
+        case ITEM_SLOT_ALREADY_EQUIPPED: {
+          Menu *new_menu = build_menu(MENU_CONFIRM, player);
+          new_menu->prev_menu = player->current_menu;
+          player->current_menu = new_menu;
+          return 1;
         }
-        else if (removed_from_inventory == ITEM_REMOVE_FROM_ROOM_SUCCESS) {
-          print_text(PRINT_NORMAL5, "Equipped %s\n", current_item->name);
+        case ITEM_EQUIP_SUCCESS: {
+          int removed_from_inventory = remove_item_from_player_inventory(player, current_item);
+
+          switch (removed_from_inventory) {
+            case ITEM_REMOVE_FROM_INVENTORY_INVALID:
+            case ITEM_REMOVE_FROM_INVENTORY_ERROR:
+              unequip_item(player, current_item);
+              print_text(PRINT_NORMAL5, "Unable to remove item from inventory\n");
+              break;
+            case ITEM_REMOVE_FROM_INVENTORY_SUCCESS:
+              print_text(PRINT_NORMAL5, "Equipped %s\n", current_item->name);
+              break;
+            default:
+              break;
+          }
         }
+        default:
+          break;
       }
       destroy_menu(player->current_menu);
       Menu *new_menu = build_menu(prev_menu_kind, player);
@@ -686,16 +817,95 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
     }
     case ACTION_UNEQUIP_ITEM: {
       int unequipped_item = unequip_item(player, current_item);
-      if (unequipped_item == ITEM_UNEQUIP_INVALID || unequipped_item == ITEM_UNEQUIP_ERROR) {
-        print_text(PRINT_NORMAL5, "Unable to unequip item\n");
-      } else if (unequipped_item == ITEM_UNEQUIP_SUCCESS) {
-        int added_to_inventory = add_item_to_player_inventory(player, current_item);
-        if (added_to_inventory == ITEM_REMOVE_FROM_INVENTORY_INVALID || added_to_inventory == ITEM_REMOVE_FROM_INVENTORY_ERROR) {
-          unequip_item(player, current_item);
-          print_text(PRINT_NORMAL5, "Unable to add item to inventory\n");
+
+      switch (unequipped_item) {
+        case ITEM_UNEQUIP_INVALID:
+        case ITEM_UNEQUIP_ERROR:
+          print_text(PRINT_NORMAL5, "Unable to unequip item\n");
+        case ITEM_UNEQUIP_SUCCESS: {
+          int added_to_inventory = add_item_to_player_inventory(player, current_item);
+
+          switch (added_to_inventory) {
+            case ITEM_ADD_TO_INVENTORY_INVALID:
+            case ITEM_ADD_TO_INVENTORY_ERROR:
+              print_text(PRINT_NORMAL5, "Unable to add item to inventory\n");
+              break;
+            case INVENTORY_ITEMS_FULL: {
+              Menu *new_menu = build_menu(MENU_FIND_INVENTORY_ITEM_TO_SWAP, player);
+              new_menu->prev_menu = player->current_menu->prev_menu->prev_menu;
+              player->current_menu = new_menu;
+              return 1;
+            }
+            case ITEM_ADD_TO_INVENTORY_SUCCESS: {
+              print_text(PRINT_NORMAL5, "Unequipped %s\n", current_item->name);
+              destroy_menu(player->current_menu);
+              Menu *new_menu = build_menu(prev_menu_kind, player);
+              new_menu->prev_menu = &view_menu;
+              player->current_menu = new_menu;
+              return 1;
+            }
+          }
         }
-        else if (added_to_inventory == ITEM_REMOVE_FROM_ROOM_SUCCESS) {
-          print_text(PRINT_NORMAL5, "Unequipped %s\n", current_item->name);
+      }
+    }
+    case ACTION_SWAP_EQUIPPED_ITEM: {
+      ItemKind equipped_item_kind = player->current_menu->prev_menu->item->kind;
+      Item **equipped_item;
+      Item *selected_item = player->current_menu->prev_menu->item;
+
+      switch (equipped_item_kind) {
+        case ITEM_WEAPON: {
+          equipped_item = &player->weapon;
+          break;
+        }
+        case ITEM_SHIELD: {
+          equipped_item = &player->shield;
+          break;
+        }
+        case ITEM_ACCESSORY: {
+          equipped_item = &player->accessory;
+          break;
+        }
+        default:
+          equipped_item = NULL;
+          break;
+      }
+
+      int swapped_items = swap_items(player, equipped_item, selected_item);
+
+      switch (swapped_items) {
+        case ITEM_SWAP_INVALID:
+        case ITEM_SWAP_ERROR:
+          print_text(PRINT_NORMAL5, "Unable to swap items");
+          break;
+        case ITEM_SWAP_SUCCESS: {
+          print_text(PRINT_NORMAL5, "Equipped %s\nUnequipped %s\n", selected_item->name, (*equipped_item)->name);
+        }
+      }
+      destroy_menu(player->current_menu);
+      Menu *new_menu = build_menu(prev_menu_kind, player);
+      new_menu->prev_menu = &view_menu;
+      player->current_menu = new_menu;
+      return 1;
+    }
+    case ACTION_SWAP_UNEQUIPPED_ITEM: {
+      ItemKind equipped_item_kind = player->current_menu->prev_menu->item->kind;
+      Item *equipped_item = player->current_menu->prev_menu->item;
+
+      Item **unequipped_item;
+
+      for (int i = 0; i < player->inventory_count; i++) {
+      }
+
+      int swapped_items = swap_items(player, unequipped_item, equipped_item);
+
+      switch (swapped_items) {
+        case ITEM_SWAP_INVALID:
+        case ITEM_SWAP_ERROR:
+          print_text(PRINT_NORMAL5, "Unable to swap items");
+          break;
+        case ITEM_SWAP_SUCCESS: {
+          print_text(PRINT_NORMAL5, "Equipped %s\nUnequipped %s\n", equipped_item->name, (*unequipped_item)->name);
         }
       }
       destroy_menu(player->current_menu);
@@ -766,11 +976,14 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
       player->current_menu = player->current_menu->next_page;
       return 1;
     }
+    case ACTION_NO:
     case ACTION_BACK_MENU: {
       Menu *temp = player->current_menu;
       player->current_menu = player->current_menu->prev_menu;
       destroy_menu(temp);
       return 1;
+    }
+    case ACTION_YES: {
     }
     case ACTION_QUIT_GAME: {
       print_text(PRINT_NORMAL5, "You open your eyes and realize it was just a dream.\n");

@@ -84,8 +84,12 @@ int equip_item(Player *player, Item *item) {
     case ITEM_POTION:
       return ITEM_EQUIP_INVALID;
     case ITEM_ACCESSORY:
-      player->accessory = item;
-      return ITEM_EQUIP_SUCCESS;
+      if (player->accessory == NULL) {
+        player->accessory = item;
+        return ITEM_EQUIP_SUCCESS;
+      } else {
+        return ITEM_SLOT_ALREADY_EQUIPPED;
+      }
     default:
       return ITEM_EQUIP_ERROR;
   }
