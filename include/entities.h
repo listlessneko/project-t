@@ -1,5 +1,8 @@
 #pragma once
 
+#define MAX_NAME_LEN 128
+#define MAX_DESCRIPTION_LEN 512
+
 typedef struct Player Player;
 typedef struct Enemy Enemy;
 typedef struct Room Room;
@@ -45,6 +48,6 @@ typedef enum ItemKind {
 typedef struct BaseEntity {
   EntityKind entity_kind;
   int id;
-  char name[32];
-  char description[256];
+  char name[MAX_NAME_LEN];
+  char description[MAX_DESCRIPTION_LEN];
 } BaseEntity;

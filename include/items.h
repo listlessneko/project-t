@@ -24,8 +24,8 @@ typedef struct Accessory {
 typedef struct Item {
   EntityKind entity_kind;
   int id;
-  char name[32];
-  char description[256];
+  char name[MAX_NAME_LEN];
+  char description[MAX_DESCRIPTION_LEN];
   ItemKind kind;
   union {
     Weapon weapon;

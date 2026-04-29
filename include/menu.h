@@ -57,8 +57,8 @@ typedef struct MenuNode {
     MenuKind menu_kind;
     ActionKind action_kind;
   } data_kind;
-  char name[128];
-  char description[512];
+  char name[MAX_NAME_LEN];
+  char description[MAX_DESCRIPTION_LEN];
   char key;
   int is_static;
   union {
@@ -74,8 +74,8 @@ typedef struct MenuNode {
 
 typedef struct Menu {
   MenuKind menu_kind;
-  char name[128];
-  char description[516];
+  char name[MAX_NAME_LEN];
+  char description[MAX_DESCRIPTION_LEN];
   char options[1000];
   int is_static;
   struct Menu *prev_menu;

@@ -915,18 +915,21 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
       return 1;
     }
     case ACTION_USE_ITEM: {
+      char name_buffer[MAX_NAME_LEN];
+      strncpy(name_buffer, current_item->name, sizeof(name_buffer));
+      name_buffer[MAX_NAME_LEN-1] = '\0';
+      char health_regained[12];
+      snprintf(health_regained, sizeof(health_regained), "%+d hp", current_item->data.potion.health_bonus);
+      char attack_bonus[12];
+      snprintf(attack_bonus, sizeof(attack_bonus), "%+d atk", current_item->data.potion.attack_bonus);
+      char defense_bonus[12];
+      snprintf(defense_bonus, sizeof(defense_bonus), "%+d def", current_item->data.potion.defense_bonus);
       prev_menu_kind = player->current_menu->prev_menu->menu_kind;
       int used_item = use_item(player, current_item);
       if (used_item == ITEM_USE_INVALID || used_item == ITEM_USE_ERROR) {
         print_text(PRINT_NORMAL5, "Unable to use item\n");
       } else if (used_item == ITEM_USE_SUCCESS) {
-        char health_regained[12];
-        snprintf(health_regained, sizeof(health_regained), "%+d hp", current_item->data.potion.health_bonus);
-        char attack_bonus[12];
-        snprintf(attack_bonus, sizeof(attack_bonus), "%+d atk", current_item->data.potion.attack_bonus);
-        char defense_bonus[12];
-        snprintf(defense_bonus, sizeof(defense_bonus), "%+d def", current_item->data.potion.defense_bonus);
-        print_text(PRINT_NORMAL5, "Used %s (%s, %s, %s)\n", health_regained, attack_bonus, defense_bonus);
+        print_text(PRINT_NORMAL5, "Used %s (%s, %s, %s)\n", name_buffer, health_regained, attack_bonus, defense_bonus);
       }
       destroy_menu(player->current_menu);
       Menu *new_menu = build_menu(prev_menu_kind, player);
@@ -955,12 +958,15 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
       return 1;
     }
     case ACTION_THROW_AWAY_ITEM: {
+      char name_buffer[MAX_NAME_LEN];
+      strncpy(name_buffer, current_item->name, sizeof(name_buffer));
+      name_buffer[MAX_NAME_LEN-1] = '\0';
       int removed_from_inventory = remove_item_from_player_inventory(player, current_item);
       if (removed_from_inventory == ITEM_REMOVE_FROM_INVENTORY_INVALID || removed_from_inventory == ITEM_REMOVE_FROM_INVENTORY_ERROR) {
         print_text(PRINT_NORMAL5, "Unable to remove item from inventory\n");
       } else if (removed_from_inventory == ITEM_REMOVE_FROM_INVENTORY_SUCCESS) {
         destroy_item(current_item);
-        print_text(PRINT_NORMAL5, "You toss the %s into the void.\n", current_item->name);
+        print_text(PRINT_NORMAL5, "You toss the %s into the void.\n", name_buffer);
       }
       destroy_menu(player->current_menu);
       Menu *new_menu = build_menu(MENU_VIEW_INVENTORY, player);

@@ -9,8 +9,8 @@
 typedef struct Enemy {
   EntityKind entity_kind;
   int id;
-  char name[32];
-  char description[256];
+  char name[MAX_NAME_LEN];
+  char description[MAX_DESCRIPTION_LEN];
   int level;
   int health;
   int max_health;
@@ -21,8 +21,8 @@ typedef struct Enemy {
 typedef struct Player {
   EntityKind entity_kind;
   int id;
-  char name[32];
-  char description[256];
+  char name[MAX_NAME_LEN];
+  char description[MAX_DESCRIPTION_LEN];
   int level;
   int exp;
   int health;
