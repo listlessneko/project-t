@@ -70,3 +70,15 @@ Item **filtered_inventory(Player *player, ItemKind item_kind, int *count) {
   return filtered;
 }
 
+Item **find_inventory_item(Player *player, Item *item) {
+  if (player == NULL || item == NULL) {
+    return NULL;
+  }
+
+  for (int i = 0; player->inventory_count; i++) {
+    if (player->inventory[i]->id == item->id) {
+      return &player->inventory[i];
+    }
+  }
+  return NULL;
+}

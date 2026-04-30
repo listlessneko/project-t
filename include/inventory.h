@@ -4,4 +4,5 @@ void view_inventory(Player *player);
 int add_item_to_player_inventory(Player *player, Item *item);
 int remove_item_from_player_inventory(Player *player, Item *item);
 Item **filtered_inventory(Player *player, ItemKind, int *count);
+Item **find_inventory_item(Player *player, Item *item);
 void discard_item(Player *player, Item *item);
