@@ -3,6 +3,11 @@
 #include "entities.h"
 #include "rooms.h"
 
+#define MAX_MENU_NAME_LEN (MAX_NAME_LEN * 2 + 2)
+#define MAX_MENU_DESCRIPTION_LEN (MAX_DESCRIPTION_LEN * 2 + 2)
+#define MAX_MENU_NODE_NAME_LEN (MAX_NAME_LEN * 2 + 2)
+#define MAX_MENU_NODE_DESCRIPTION_LEN (MAX_DESCRIPTION_LEN * 2 + 2)
+
 typedef enum NodeKind {
   NODE_MENU,
   NODE_MENU_ITEM,
@@ -57,8 +62,8 @@ typedef struct MenuNode {
     MenuKind menu_kind;
     ActionKind action_kind;
   } data_kind;
-  char name[MAX_NAME_LEN];
-  char description[MAX_DESCRIPTION_LEN];
+  char name[MAX_MENU_NODE_NAME_LEN];
+  char description[MAX_MENU_NODE_DESCRIPTION_LEN];
   char key;
   int is_static;
   union {
@@ -74,8 +79,8 @@ typedef struct MenuNode {
 
 typedef struct Menu {
   MenuKind menu_kind;
-  char name[MAX_NAME_LEN];
-  char description[MAX_DESCRIPTION_LEN];
+  char name[MAX_MENU_NAME_LEN];
+  char description[MAX_MENU_DESCRIPTION_LEN];
   char options[1000];
   int is_static;
   struct Menu *prev_menu;
