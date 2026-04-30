@@ -585,6 +585,7 @@ Menu *build_item_menu(MenuKind menu_kind, Item *item) {
 
       new_menu->nodes[0] = yes_node;
       new_menu->nodes[1] = &no_node;
+      break;
     }
     case MENU_VIEW_INVENTORY_ITEM: {
 
@@ -813,6 +814,7 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
         case ITEM_UNEQUIP_INVALID:
         case ITEM_UNEQUIP_ERROR:
           print_text(PRINT_NORMAL5, "Unable to unequip item\n");
+          return 1;
         case ITEM_UNEQUIP_SUCCESS: {
           int added_to_inventory = add_item_to_player_inventory(player, current_item);
 
@@ -838,6 +840,11 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
           }
         }
       }
+      destroy_menu(player->current_menu);
+      Menu *new_menu = build_menu(prev_menu_kind, player);
+      new_menu->prev_menu = &view_menu;
+      player->current_menu = new_menu;
+      return 1;
     }
     case ACTION_SWAP_EQUIPPED_ITEM: {
       ItemKind equipped_item_kind = player->current_menu->prev_menu->item->kind;
@@ -881,15 +888,30 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
       return 1;
     }
     case ACTION_SWAP_UNEQUIPPED_ITEM: {
-      ItemKind equipped_item_kind = player->current_menu->prev_menu->item->kind;
-      Item *equipped_item = player->current_menu->prev_menu->item;
+      ItemKind unequipped_item_kind = player->current_menu->prev_menu->item->kind;
+      Item **unequipped_item = find_inventory_item(player, player->current_menu->prev_menu->item);
 
-      Item **unequipped_item;
+      Item **equipped_item;
 
-      for (int i = 0; i < player->inventory_count; i++) {
+      switch (unequipped_item_kind) {
+        case ITEM_WEAPON: {
+          equipped_item = &player->weapon;
+          break;
+        }
+        case ITEM_SHIELD: {
+          equipped_item = &player->shield;
+          break;
+        }
+        case ITEM_ACCESSORY: {
+          equipped_item = &player->accessory;
+          break;
+        }
+        default:
+          equipped_item = NULL;
+          break;
       }
 
-      int swapped_items = swap_items(player, unequipped_item, equipped_item);
+      int swapped_items = swap_items(player, unequipped_item, *equipped_item);
 
       switch (swapped_items) {
         case ITEM_SWAP_INVALID:
@@ -897,7 +919,7 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
           print_text(PRINT_NORMAL5, "Unable to swap items");
           break;
         case ITEM_SWAP_SUCCESS: {
-          print_text(PRINT_NORMAL5, "Equipped %s\nUnequipped %s\n", equipped_item->name, (*unequipped_item)->name);
+          print_text(PRINT_NORMAL5, "Equipped %s\nUnequipped %s\n", (*equipped_item)->name, (*unequipped_item)->name);
         }
       }
       destroy_menu(player->current_menu);
