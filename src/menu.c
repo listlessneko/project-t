@@ -121,8 +121,8 @@ MenuNode unequip_node = {
 };
 
 MenuNode swap_node = {
-  .node_kind = NODE_ACTION,
-  .data_kind.action_kind = ACTION_SWAP_EQUIPPED_ITEM,
+  .node_kind = NODE_MENU,
+  .data_kind.menu_kind = MENU_FIND_INVENTORY_ITEM_TO_SWAP,
   .name = { "Swap" },
   .description = { "Swap equipment." },
   .key = 'S',
@@ -174,14 +174,14 @@ MenuNode back_node = {
   .is_static = 1,
 };
 
-MenuNode yes_node = {
-  .node_kind = NODE_ACTION,
-  .data_kind.action_kind = ACTION_YES,
-  .name = { "Yes" },
-  .description = { "Confirm action." },
-  .key = 'Y',
-  .is_static = 1,
-};
+// MenuNode yes_node = {
+//   .node_kind = NODE_ACTION,
+//   .data_kind.action_kind = ACTION_YES,
+//   .name = { "Yes" },
+//   .description = { "Confirm action." },
+//   .key = 'Y',
+//   .is_static = 1,
+// };
 
 MenuNode no_node = {
   .node_kind = NODE_ACTION,
@@ -241,7 +241,7 @@ MenuNode *build_view_item_menu_node(MenuKind menu_kind, Item *item) {
     return NULL;
   }
 
-  menu_node->node_kind = NODE_MENU_ITEM;
+  menu_node->node_kind = NODE_ITEM_MENU;
   menu_node->data_kind.menu_kind = menu_kind;
   menu_node->data.item = item;
   menu_node->key = '\0';
@@ -256,7 +256,7 @@ MenuNode *build_view_equipment_menu_node(ItemKind item_kind, Item *item) {
     return NULL;
   }
 
-  menu_node->node_kind = NODE_MENU_ITEM;
+  menu_node->node_kind = NODE_ITEM_MENU;
   menu_node->data_kind.menu_kind = MENU_VIEW_EQUIPPED_ITEM;
   menu_node->data.item = item;
   menu_node->key = item_kind_name(item_kind)[0];
@@ -492,7 +492,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       int nav_options = 3;
       int current_item = 0;
       int filtered_count = 0;
-      Item **filtered = filtered_inventory(player, player->current_menu->item->kind, &filtered_count);
+      Item **filtered = filtered_inventory(player, player->current_menu->prev_menu->item->kind, &filtered_count);
       int remaining = filtered_count - current_item;
       int page_size = remaining > item_limit ? item_limit : remaining;
       int sub_pages = (filtered_count + item_limit - 1) / item_limit;
@@ -506,7 +506,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       Menu *first_page = new_menu;
       int i;
       for (i = 0; i < page_size; i++) {
-        new_menu->nodes[i] = build_view_item_menu_node(MENU_SWAP_WITH_EQUIPPED_ITEM, filtered[current_item]);
+        new_menu->nodes[i] = build_view_item_menu_node(MENU_SWAP_WITH_UNEQUIPPED_ITEM, filtered[current_item]);
         current_item++;
       }
       new_menu->nodes[i++] = &prev_node;
@@ -523,7 +523,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
         snprintf(next_page->name, sizeof(next_page->name), "Inventory:\n (Page %d of %d)", current_sub_page, sub_pages);
         int j;
         for (j = 0; j < page_size; j++) {
-          next_page->nodes[j] = build_view_item_menu_node(MENU_SWAP_WITH_EQUIPPED_ITEM, filtered[current_item]);
+          next_page->nodes[j] = build_view_item_menu_node(MENU_SWAP_WITH_UNEQUIPPED_ITEM, filtered[current_item]);
           current_item++;
         }
         next_page->nodes[j++] = &prev_node;
@@ -557,7 +557,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
   return new_menu;
 }
 
-Menu *build_item_menu(MenuKind menu_kind, Item *item) {
+Menu *build_item_menu(MenuKind menu_kind, Item *item, Player *player) {
   Menu *new_menu;
 
   switch (menu_kind) {
@@ -572,23 +572,7 @@ Menu *build_item_menu(MenuKind menu_kind, Item *item) {
       new_menu->nodes[2] = &back_node;
       break;
     }
-    case MENU_SWAP_WITH_INVENTORY_ITEM: {
-      new_menu = menu_malloc(2);
-      strncpy(new_menu->name, "Swap with this item?", sizeof(new_menu->name) - 1);
-      new_menu->name[MAX_NAME_LEN-1] = '\0';
-
-      MenuNode *yes_node = malloc(sizeof(MenuNode));
-      yes_node->node_kind = NODE_ACTION;
-      yes_node->data_kind.action_kind = ACTION_SWAP_EQUIPPED_ITEM;
-      strncpy(yes_node->name, "Yes", sizeof(yes_node->name) - 1);
-      yes_node->key = 'Y';
-
-      new_menu->nodes[0] = yes_node;
-      new_menu->nodes[1] = &no_node;
-      break;
-    }
     case MENU_VIEW_INVENTORY_ITEM: {
-
       switch (item->kind) {
         case ITEM_WEAPON:
         case ITEM_SHIELD:
@@ -629,6 +613,42 @@ Menu *build_item_menu(MenuKind menu_kind, Item *item) {
       }
       break;
     }
+    case MENU_SWAP_WITH_EQUIPPED_ITEM: {
+      new_menu = menu_malloc(2);
+      new_menu->menu_kind = menu_kind;
+      new_menu->item = item;
+      Item *current_equipped;
+
+      switch (item->kind) {
+        case ITEM_WEAPON: {
+          current_equipped = player->weapon;
+          break;
+        }
+        case ITEM_SHIELD: {
+          current_equipped = player->shield;
+          break;
+        }
+        case ITEM_ACCESSORY: {
+          current_equipped = player->accessory;
+          break;
+        }
+        default:
+          current_equipped = NULL;
+          break;
+      }
+
+      snprintf(new_menu->name, sizeof(new_menu->name), "Swap with %s?", current_equipped->name);
+      MenuNode *yes_node = malloc(sizeof(MenuNode));
+      yes_node->node_kind = NODE_ACTION;
+      yes_node->data_kind.action_kind = ACTION_SWAP_WITH_EQUIPPED_ITEM;
+      strncpy(yes_node->name, "Yes", sizeof(yes_node->name) - 1);
+      yes_node->name[127] = '\0';
+      yes_node->key = 'Y';
+
+      new_menu->nodes[0] = yes_node;
+      new_menu->nodes[1] = &no_node;
+      break;
+    }
     case MENU_VIEW_EQUIPPED_ITEM: {
       if (item == NULL) {
         new_menu = NULL;
@@ -643,6 +663,22 @@ Menu *build_item_menu(MenuKind menu_kind, Item *item) {
       new_menu->nodes[0] = &unequip_node;
       new_menu->nodes[1] = &swap_node;
       new_menu->nodes[2] = &back_node;
+      break;
+    }
+    case MENU_SWAP_WITH_UNEQUIPPED_ITEM: {
+      new_menu = menu_malloc(2);
+      new_menu->menu_kind = menu_kind;
+      new_menu->item = item;
+      snprintf(new_menu->name, sizeof(new_menu->name), "Swap with %s?",item->name);
+      MenuNode *yes_node = malloc(sizeof(MenuNode));
+      yes_node->node_kind = NODE_ACTION;
+      yes_node->data_kind.action_kind = ACTION_SWAP_WITH_UNEQUIPPED_ITEM;
+      strncpy(yes_node->name, "Yes", sizeof(yes_node->name) - 1);
+      yes_node->name[127] = '\0';
+      yes_node->key = 'Y';
+
+      new_menu->nodes[0] = yes_node;
+      new_menu->nodes[1] = &no_node;
       break;
     }
     case MENU_VIEW_UNEQUIPPED_ITEM: {
@@ -698,8 +734,12 @@ void destroy_menu(Menu *menu) {
 
 void display_menu(Player *player) {
   Menu *menu = player->current_menu;
-  print_text(PRINT_NORMAL5, "%s\n", menu->name);
-  print_text(PRINT_NORMAL5, "%s\n", menu->description);
+  if (menu->name[0] != '\0') {
+    print_text(PRINT_NORMAL5, "%s\n", menu->name);
+  }
+  if (menu->description[0] != '\0') {
+    print_text(PRINT_NORMAL5, "%s\n", menu->description);
+  }
 
   MenuKind menu_kind = menu->menu_kind;
   switch (menu_kind) {
@@ -777,7 +817,7 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
           print_text(PRINT_NORMAL5, "Unable to equip item\n");
           break;
         case ITEM_SLOT_ALREADY_EQUIPPED: {
-          Menu *new_menu = build_menu(MENU_FIND_INVENTORY_ITEM_TO_SWAP, player);
+          Menu *new_menu = build_item_menu(MENU_SWAP_WITH_EQUIPPED_ITEM, current_item, player);
           new_menu->prev_menu = player->current_menu;
           player->current_menu = new_menu;
           return 1;
@@ -846,8 +886,9 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
       player->current_menu = new_menu;
       return 1;
     }
-    case ACTION_SWAP_EQUIPPED_ITEM: {
-      ItemKind equipped_item_kind = player->current_menu->prev_menu->item->kind;
+    case ACTION_SWAP_WITH_EQUIPPED_ITEM: {
+
+      ItemKind equipped_item_kind = player->current_menu->item->kind;
       Item **equipped_item;
 
       switch (equipped_item_kind) {
@@ -868,7 +909,7 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
           break;
       }
 
-      Item **selected_item = find_inventory_item(player, player->current_menu->prev_menu->item);
+      Item **selected_item = find_inventory_item(player, player->current_menu->item);
 
       int swapped_items = swap_items(player, equipped_item, *selected_item);
 
@@ -878,7 +919,12 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
           print_text(PRINT_NORMAL5, "Unable to swap items");
           break;
         case ITEM_SWAP_SUCCESS: {
-          print_text(PRINT_NORMAL5, "Equipped %s\nUnequipped %s\n", (*selected_item)->name, (*equipped_item)->name);
+          print_text(PRINT_NORMAL5, "Equipped %s\nUnequipped %s\n", (*equipped_item)->name, (*selected_item)->name);
+          destroy_menu(player->current_menu);
+          Menu *new_menu = build_menu(MENU_VIEW_INVENTORY, player);
+          new_menu->prev_menu = &view_menu;
+          player->current_menu = new_menu;
+          return 1;
         }
       }
       destroy_menu(player->current_menu);
@@ -887,9 +933,9 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
       player->current_menu = new_menu;
       return 1;
     }
-    case ACTION_SWAP_UNEQUIPPED_ITEM: {
-      ItemKind unequipped_item_kind = player->current_menu->prev_menu->item->kind;
-      Item **unequipped_item = find_inventory_item(player, player->current_menu->prev_menu->item);
+    case ACTION_SWAP_WITH_UNEQUIPPED_ITEM: {
+      ItemKind unequipped_item_kind = player->current_menu->item->kind;
+      Item **unequipped_item = find_inventory_item(player, player->current_menu->item);
 
       Item **equipped_item;
 
@@ -911,7 +957,7 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
           break;
       }
 
-      int swapped_items = swap_items(player, unequipped_item, *equipped_item);
+      int swapped_items = swap_items(player, equipped_item, *unequipped_item);
 
       switch (swapped_items) {
         case ITEM_SWAP_INVALID:
@@ -920,6 +966,11 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
           break;
         case ITEM_SWAP_SUCCESS: {
           print_text(PRINT_NORMAL5, "Equipped %s\nUnequipped %s\n", (*equipped_item)->name, (*unequipped_item)->name);
+          destroy_menu(player->current_menu);
+          Menu *new_menu = build_menu(MENU_VIEW_EQUIPMENT, player);
+          new_menu->prev_menu = &view_menu;
+          player->current_menu = new_menu;
+          return 1;
         }
       }
       destroy_menu(player->current_menu);
@@ -1060,12 +1111,12 @@ int playing(Player *player) {
       player->current_menu = new_menu;
       return 1;
     }
-    case NODE_MENU_ITEM: {
+    case NODE_ITEM_MENU: {
       print_text(PRINT_FAST3, "Selected: Item\n");
       MenuKind menu_kind = menu_node->data_kind.menu_kind;
       print_text(PRINT_FAST3, "Selected MenuKind: %d\n", menu_kind);
       Item *item = menu_node->data.item;
-      Menu *new_menu = build_item_menu(menu_kind, item);
+      Menu *new_menu = build_item_menu(menu_kind, item, player);
       if (new_menu != NULL) {
         new_menu->prev_menu = player->current_menu;
         player->current_menu = new_menu;
