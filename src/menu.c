@@ -429,7 +429,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu->nodes[i++] = &prev_node;
       new_menu->nodes[i++] = &next_node;
       new_menu->nodes[i++] = &back_node;
-      new_menu->prev_menu = player->current_menu;
+      new_menu->prev_menu = &view_menu;
 
       while (current_sub_page < sub_pages) {
         current_sub_page++;
@@ -446,7 +446,7 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
         next_page->nodes[j++] = &prev_node;
         next_page->nodes[j++] = &next_node;
         next_page->nodes[j++] = &back_node;
-        next_page->prev_menu = player->current_menu;
+        next_page->prev_menu = &view_menu;
         new_menu->next_page = next_page;
         next_page->prev_page = new_menu;
         new_menu = next_page;
@@ -563,6 +563,7 @@ Menu *build_item_menu(MenuKind menu_kind, Item *item, Player *player) {
   switch (menu_kind) {
     case MENU_VIEW_ROOM_ITEM: {
       new_menu = menu_malloc(3);
+      new_menu->item = item;
       snprintf(new_menu->name, sizeof(new_menu->name), "%s", item->name);
       snprintf(new_menu->description, sizeof(new_menu->description), "%s", item->description);
       new_menu->menu_kind = menu_kind;
@@ -789,17 +790,32 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
     }
     case ACTION_PICK_UP_ITEM: {
       int added_to_inventory = add_item_to_player_inventory(player, current_item);
-      if (added_to_inventory == INVENTORY_ITEMS_FULL) {
-        print_text(PRINT_NORMAL5, "You're already carrying the weight of the world. Do you need to add any more?\n");
-      } else if (added_to_inventory == ITEM_ADD_TO_INVENTORY_INVALID || added_to_inventory == ITEM_ADD_TO_INVENTORY_ERROR) {
-        print_text(PRINT_NORMAL5, "Unable to place item in inventory\n");
-      } else if (added_to_inventory == ITEM_ADD_TO_INVENTORY_SUCCESS) {
-        int removed_from_room = remove_item_from_room(current_room, current_item);
-        if (removed_from_room == ITEM_REMOVE_FROM_ROOM_INVALID || removed_from_room == ITEM_ADD_TO_INVENTORY_ERROR) {
-          remove_item_from_player_inventory(player, current_item);
-          print_text(PRINT_NORMAL5, "Unable to pick up item from ground\n");
-        } else if (removed_from_room == ITEM_REMOVE_FROM_INVENTORY_SUCCESS) {
-          print_text(PRINT_NORMAL5, "Picked up %s", current_item->name);
+
+      switch (added_to_inventory) {
+        case INVENTORY_ITEMS_FULL: {
+          print_text(PRINT_NORMAL5, "You're already carrying the weight of the world. Do you need to add any more?\n");
+          break;
+        }
+        case ITEM_ADD_TO_INVENTORY_INVALID:
+        case ITEM_ADD_TO_INVENTORY_ERROR: {
+          print_text(PRINT_NORMAL5, "Unable to place item in inventory\n");
+          break;
+        }
+        case ITEM_ADD_TO_INVENTORY_SUCCESS: {
+          int removed_from_room = remove_item_from_room(current_room, current_item);
+
+          switch (removed_from_room) {
+            case ITEM_REMOVE_FROM_ROOM_INVALID:
+            case ITEM_REMOVE_FROM_ROOM_ERROR: {
+              remove_item_from_player_inventory(player, current_item);
+              print_text(PRINT_NORMAL5, "Unable to pick up item from ground\n");
+              break;
+            }
+            case ITEM_REMOVE_FROM_ROOM_SUCCESS: {
+              print_text(PRINT_NORMAL5, "Picked up %s", current_item->name);
+              break;
+            }
+          }
         }
       }
       destroy_menu(player->current_menu);
@@ -990,11 +1006,19 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
       char defense_bonus[12];
       snprintf(defense_bonus, sizeof(defense_bonus), "%+d def", current_item->data.potion.defense_bonus);
       prev_menu_kind = player->current_menu->prev_menu->menu_kind;
+
       int used_item = use_item(player, current_item);
-      if (used_item == ITEM_USE_INVALID || used_item == ITEM_USE_ERROR) {
-        print_text(PRINT_NORMAL5, "Unable to use item\n");
-      } else if (used_item == ITEM_USE_SUCCESS) {
-        print_text(PRINT_NORMAL5, "Used %s (%s, %s, %s)\n", name_buffer, health_regained, attack_bonus, defense_bonus);
+
+      switch (used_item) {
+        case ITEM_USE_INVALID:
+        case ITEM_USE_ERROR: {
+          print_text(PRINT_NORMAL5, "Unable to use item\n");
+          break;
+        }
+        case ITEM_USE_SUCCESS: {
+          print_text(PRINT_NORMAL5, "Used %s (%s, %s, %s)\n", name_buffer, health_regained, attack_bonus, defense_bonus);
+          break;
+        }
       }
       destroy_menu(player->current_menu);
       Menu *new_menu = build_menu(prev_menu_kind, player);
@@ -1004,16 +1028,32 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
     }
     case ACTION_DROP_ITEM: {
       int added_to_room = add_item_to_room(current_room, current_item);
-      if (added_to_room == ROOM_ITEMS_FULL) {
-        print_text(PRINT_NORMAL5, "You should stop littering. The world is already filled with enough rubbish.\n");
-      } else if (added_to_room == ITEM_ADD_TO_ROOM_INVALID || added_to_room == ITEM_ADD_TO_INVENTORY_ERROR) {
-        print_text(PRINT_NORMAL5, "Unable to drop item on ground\n");
-      } else if (added_to_room == ITEM_ADD_TO_ROOM_SUCCESS) {
-        int removed_from_inventory = remove_item_from_player_inventory(player, current_item);
-        if (removed_from_inventory == ITEM_REMOVE_FROM_INVENTORY_INVALID || removed_from_inventory == ITEM_REMOVE_FROM_INVENTORY_ERROR) {
-          print_text(PRINT_NORMAL5, "Unable to remove item from inventory\n");
-        } else if (removed_from_inventory == ITEM_REMOVE_FROM_INVENTORY_SUCCESS) {
-          print_text(PRINT_NORMAL5, "Dropped %s\n", current_item->name);
+
+      switch (added_to_room) {
+        case ROOM_ITEMS_FULL: {
+          print_text(PRINT_NORMAL5, "You should stop littering. The world is already filled with enough rubbish.\n");
+          break;
+        }
+        case ITEM_ADD_TO_ROOM_INVALID:
+        case ITEM_ADD_TO_ROOM_ERROR: {
+          print_text(PRINT_NORMAL5, "Unable to drop item on ground\n");
+          break;
+        }
+        case ITEM_ADD_TO_ROOM_SUCCESS: {
+          int removed_from_inventory = remove_item_from_player_inventory(player, current_item);
+
+          switch (removed_from_inventory) {
+            case ITEM_REMOVE_FROM_INVENTORY_INVALID:
+            case ITEM_REMOVE_FROM_INVENTORY_ERROR: {
+              remove_item_from_room(current_room, current_item);
+              print_text(PRINT_NORMAL5, "Unable to remove item from inventory\n");
+              break;
+            }
+            case ITEM_REMOVE_FROM_INVENTORY_SUCCESS: {
+              print_text(PRINT_NORMAL5, "Dropped %s\n", current_item->name);
+              break;
+            }
+          }
         }
       }
       destroy_menu(player->current_menu);
@@ -1026,12 +1066,20 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
       char name_buffer[MAX_NAME_LEN];
       strncpy(name_buffer, current_item->name, sizeof(name_buffer));
       name_buffer[MAX_NAME_LEN-1] = '\0';
+
       int removed_from_inventory = remove_item_from_player_inventory(player, current_item);
-      if (removed_from_inventory == ITEM_REMOVE_FROM_INVENTORY_INVALID || removed_from_inventory == ITEM_REMOVE_FROM_INVENTORY_ERROR) {
-        print_text(PRINT_NORMAL5, "Unable to remove item from inventory\n");
-      } else if (removed_from_inventory == ITEM_REMOVE_FROM_INVENTORY_SUCCESS) {
-        destroy_item(current_item);
-        print_text(PRINT_NORMAL5, "You toss the %s into the void.\n", name_buffer);
+
+      switch (removed_from_inventory) {
+        case ITEM_REMOVE_FROM_INVENTORY_INVALID:
+        case ITEM_REMOVE_FROM_INVENTORY_ERROR: {
+          print_text(PRINT_NORMAL5, "Unable to remove item from inventory\n");
+          break;
+        }
+        case ITEM_REMOVE_FROM_INVENTORY_SUCCESS: {
+          destroy_item(current_item);
+          print_text(PRINT_NORMAL5, "You toss the %s into the void.\n", name_buffer);
+          break;
+        }
       }
       destroy_menu(player->current_menu);
       Menu *new_menu = build_menu(MENU_VIEW_INVENTORY, player);
