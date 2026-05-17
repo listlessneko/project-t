@@ -5,7 +5,6 @@
 #include "game.h"
 #include "rooms.h"
 #include "items.h"
-#include "terminal.h"
 #include "utils.h"
 
 RoomKindCounter room_kind_counter = {
@@ -252,6 +251,8 @@ Room *build_room(Player *player, DirectionKind direction) {
     room_kind_counter.safe++;
     strcpy(new_room->name, safe_room_appearance_templates[0].name);
     strcpy(new_room->description, safe_room_appearance_templates[0].description);
+    Item *health_potion = create_item(ITEM_POTION, "Health Potion", 5, 0, 0);
+    add_item_to_room(new_room, health_potion);
   } else {
 
     int visited_count = player->visited_rooms->count;

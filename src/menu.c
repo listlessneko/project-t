@@ -93,9 +93,18 @@ MenuNode pick_up_node = {
   .is_static = 1,
 };
 
-MenuNode use_node = {
+MenuNode use_room_item_node = {
   .node_kind = NODE_ACTION,
-  .data_kind.action_kind = ACTION_USE_ITEM,
+  .data_kind.action_kind = ACTION_USE_ROOM_ITEM,
+  .name = { "Use" },
+  .description = { "Use item." },
+  .key = 'U',
+  .is_static = 1,
+};
+
+MenuNode use_inventory_item_node = {
+  .node_kind = NODE_ACTION,
+  .data_kind.action_kind = ACTION_USE_INVENTORY_ITEM,
   .name = { "Use" },
   .description = { "Use item." },
   .key = 'U',
@@ -569,7 +578,7 @@ Menu *build_item_menu(MenuKind menu_kind, Item *item, Player *player) {
       new_menu->menu_kind = menu_kind;
 
       new_menu->nodes[0] = &pick_up_node;
-      new_menu->nodes[1] = &use_node;
+      new_menu->nodes[1] = &use_room_item_node;
       new_menu->nodes[2] = &back_node;
       break;
     }
@@ -597,7 +606,7 @@ Menu *build_item_menu(MenuKind menu_kind, Item *item, Player *player) {
           snprintf(new_menu->description, sizeof(new_menu->description), "%s", item->description);
           new_menu->menu_kind = menu_kind;
 
-          new_menu->nodes[0] = &use_node;
+          new_menu->nodes[0] = &use_inventory_item_node;
           new_menu->nodes[1] = &drop_node;
           new_menu->nodes[2] = &throw_away_node;
           new_menu->nodes[3] = &back_node;
@@ -812,7 +821,7 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
               break;
             }
             case ITEM_REMOVE_FROM_ROOM_SUCCESS: {
-              print_text(PRINT_NORMAL5, "Picked up %s", current_item->name);
+              print_text(PRINT_NORMAL5, "Picked up %s\n", current_item->name);
               break;
             }
           }
@@ -995,7 +1004,7 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
       player->current_menu = new_menu;
       return 1;
     }
-    case ACTION_USE_ITEM: {
+    case ACTION_USE_ROOM_ITEM: {
       char name_buffer[MAX_NAME_LEN];
       strncpy(name_buffer, current_item->name, sizeof(name_buffer));
       name_buffer[MAX_NAME_LEN-1] = '\0';
@@ -1007,7 +1016,38 @@ int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
       snprintf(defense_bonus, sizeof(defense_bonus), "%+d def", current_item->data.potion.defense_bonus);
       prev_menu_kind = player->current_menu->prev_menu->menu_kind;
 
-      int used_item = use_item(player, current_item);
+      int used_item = use_item(player, current_item, ENTITY_ROOM);
+
+      switch (used_item) {
+        case ITEM_USE_INVALID:
+        case ITEM_USE_ERROR: {
+          print_text(PRINT_NORMAL5, "Unable to use item\n");
+          break;
+        }
+        case ITEM_USE_SUCCESS: {
+          print_text(PRINT_NORMAL5, "Used %s (%s, %s, %s)\n", name_buffer, health_regained, attack_bonus, defense_bonus);
+          break;
+        }
+      }
+      destroy_menu(player->current_menu);
+      Menu *new_menu = build_menu(prev_menu_kind, player);
+      new_menu->prev_menu = &view_menu;
+      player->current_menu = new_menu;
+      return 1;
+    }
+    case ACTION_USE_INVENTORY_ITEM: {
+      char name_buffer[MAX_NAME_LEN];
+      strncpy(name_buffer, current_item->name, sizeof(name_buffer));
+      name_buffer[MAX_NAME_LEN-1] = '\0';
+      char health_regained[12];
+      snprintf(health_regained, sizeof(health_regained), "%+d hp", current_item->data.potion.health_bonus);
+      char attack_bonus[12];
+      snprintf(attack_bonus, sizeof(attack_bonus), "%+d atk", current_item->data.potion.attack_bonus);
+      char defense_bonus[12];
+      snprintf(defense_bonus, sizeof(defense_bonus), "%+d def", current_item->data.potion.defense_bonus);
+      prev_menu_kind = player->current_menu->prev_menu->menu_kind;
+
+      int used_item = use_item(player, current_item, ENTITY_PLAYER);
 
       switch (used_item) {
         case ITEM_USE_INVALID:

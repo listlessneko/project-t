@@ -3,6 +3,7 @@
 #include <string.h>
 #include "items.h"
 #include "entities.h"
+#include "rooms.h"
 #include "status.h"
 #include "game.h"
 #include "inventory.h"
@@ -137,7 +138,7 @@ int unequip_item(Player *player, Item *item) {
 }
 
 
-int use_item(Player *player, Item *item) {
+int use_item(Player *player, Item *item, EntityKind owner_kind) {
   if (player == NULL || item == NULL) {
     return ITEM_USE_INVALID;
   }
@@ -154,6 +155,17 @@ int use_item(Player *player, Item *item) {
 
       player->attack += item->data.potion.attack_bonus;
       player->defense += item->data.potion.defense_bonus;
+
+      switch (owner_kind) {
+        case ENTITY_PLAYER:
+          remove_item_from_player_inventory(player, item);
+          break;
+        case ENTITY_ROOM:
+          remove_item_from_room(player->current_room, item);
+          break;
+        default:
+          break;
+      }
 
       destroy_item(item);
       return ITEM_USE_SUCCESS;

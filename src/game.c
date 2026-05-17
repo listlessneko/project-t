@@ -17,7 +17,7 @@ Player *create_player() {
   }
   player->level = 1;
   player->exp = 0;
-  player->health = 30;
+  player->health = 24;
   player->max_health = 30;
   player->attack = 5;
   player->defense = 3;
