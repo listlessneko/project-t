@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "entities.h"
 #include "menu.h"
 #include "items.h"
 #include "inventory.h"
@@ -75,12 +76,13 @@ void initialize_visited_rooms(Player *player) {
   return;
 }
 
-Enemy *create_enemy(char *name, int max_health, int attack, int defense, int accuracy, int dodge) {
+Enemy *create_enemy(char *name, EnemyBehaviorKind behavior, int max_health, int attack, int defense, int accuracy, int dodge) {
   Enemy *enemy = malloc(sizeof(Enemy));
   if (enemy == NULL) {
     return NULL;
   }
   strcpy(enemy->name, name);
+  enemy->behavior = behavior;
   enemy->max_health = max_health;
   enemy->health = max_health;
   enemy->attack = attack;

@@ -29,6 +29,13 @@ typedef enum EnemyKind {
   ENEMY_UNKNOWN,
 } EnemyKind;
 
+typedef enum EnemyBehaviorKind {
+  BEHAVIOR_COWARDLY,
+  BEHAVIOR_AGGRESSIVE,
+  BEHAVIOR_MIXED,
+  BEHAVIOR_UNKNOWN
+} EnemyBehaviorKind;
+
 typedef enum RoomKind {
   ROOM_BARRIER,
   ROOM_SAFE,

@@ -11,6 +11,7 @@ typedef struct Enemy {
   int id;
   char name[MAX_NAME_LEN];
   char description[MAX_DESCRIPTION_LEN];
+  EnemyBehaviorKind behavior;
   int level;
   int health;
   int max_health;
@@ -49,7 +50,7 @@ typedef struct Player {
 void start_game(Player *player);
 Player *create_player();
 void initialize_visited_rooms(Player *player);
-Enemy *create_enemy(char *name, int max_health, int attack, int defense);
+Enemy *create_enemy(char *name, EnemyBehaviorKind behavior, int max_health, int attack, int defense, int accuracy, int dodge);
 void destroy_enemy(Enemy *enemy);
 void game_loop(Player *player);
 void combat(Player *player, Enemy *enemy);

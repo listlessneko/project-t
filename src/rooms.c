@@ -344,7 +344,7 @@ Room *build_room(Player *player, DirectionKind direction) {
     int fateful_max_health = rand() % (fateful_room_contents.enemy_max_health - fateful_room_contents.enemy_min_health + 1) + fateful_room_contents.enemy_min_health;
     int fateful_attack = rand() % (fateful_room_contents.enemy_max_attack - fateful_room_contents.enemy_min_attack + 1) + fateful_room_contents.enemy_min_attack;
     int fateful_defense = rand() % (fateful_room_contents.enemy_max_defense - fateful_room_contents.enemy_min_defense + 1) + fateful_room_contents.enemy_min_defense;
-    Enemy *enemy = create_enemy(fateful_room_contents.enemy_name, fateful_max_health, fateful_attack, fateful_defense, 75, 25);
+    Enemy *enemy = create_enemy(fateful_room_contents.enemy_name, BEHAVIOR_UNKNOWN, fateful_max_health, fateful_attack, fateful_defense, 75, 25);
     new_room->enemy = enemy;
   }
 
