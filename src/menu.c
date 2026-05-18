@@ -348,6 +348,23 @@ void build_map(Player *player, Menu *menu) {
   print_text(PRINT_NORMAL5, "%s", map_str);
 }
 
+void build_stats(Player *player, Menu *menu) {
+  if (player == NULL || menu == NULL) {
+    return;
+  }
+
+  char stats_str[MAX_STATS_LEN];
+
+  int offset = 0;
+  offset += snprintf(stats_str + offset, sizeof(stats_str) - offset, "Name: %s\n", player->name);
+  offset += snprintf(stats_str + offset, sizeof(stats_str) - offset, "Level: %d\n", player->level);
+  offset += snprintf(stats_str + offset, sizeof(stats_str) - offset, "Health: %d/%d\n", player->health, player->max_health);
+  offset += snprintf(stats_str + offset, sizeof(stats_str) - offset, "Attack: %d\n", player->attack);
+  offset += snprintf(stats_str + offset, sizeof(stats_str) - offset, "Defense: %d\n", player->defense);
+
+  print_text(PRINT_NORMAL5, "Player Stats:\n%s", stats_str);
+}
+
 Menu *menu_malloc(int node_count) {
   Menu *menu = malloc(sizeof(Menu) + sizeof(MenuNode *) * node_count);
   if (menu == NULL) {
@@ -555,6 +572,13 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu->nodes[0] = &back_node;
       break;
     }
+    case MENU_VIEW_STATS: {
+      new_menu = menu_malloc(1);
+      new_menu->menu_kind = menu_kind;
+      strncpy(new_menu->name, "Stats", sizeof(new_menu->name) - 1);
+      new_menu->nodes[0] = &back_node;
+      break;
+    }
     default: {
       new_menu = menu_malloc(1);
       new_menu->menu_kind = menu_kind;
@@ -755,6 +779,18 @@ void display_menu(Player *player) {
   switch (menu_kind) {
     case MENU_VIEW_MAP: {
       build_map(player, menu);
+      int offset = 0;
+      MenuNode *menu_node = menu->nodes[0];
+      offset += snprintf(menu->options + offset, sizeof(menu->options) - offset, "[%c]%s", menu_node->key, menu_node->name+1);
+      print_text(PRINT_NORMAL5, "%s", menu->options);
+      break;
+    }
+    case MENU_VIEW_STATS: {
+      build_stats(player, menu);
+      int offset = 0;
+      MenuNode *menu_node = menu->nodes[0];
+      offset += snprintf(menu->options + offset, sizeof(menu->options) - offset, "[%c]%s", menu_node->key, menu_node->name+1);
+      print_text(PRINT_NORMAL5, "%s", menu->options);
       break;
     }
     default: {

@@ -2,6 +2,7 @@
 
 #define MAX_NAME_LEN 128
 #define MAX_DESCRIPTION_LEN 512
+#define MAX_STATS_LEN 512
 
 typedef struct Player Player;
 typedef struct Enemy Enemy;
