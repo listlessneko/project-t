@@ -3,5 +3,5 @@ build/
 project-t
 compile_commands.json
 references/
-NOTES.md
+notes/
 CLAUDE.md
