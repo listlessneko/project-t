@@ -16,6 +16,8 @@ typedef struct Enemy {
   int max_health;
   int attack;
   int defense;
+  int accuracy;
+  int dodge;
 } Enemy;
 
 typedef struct Player {
@@ -29,6 +31,8 @@ typedef struct Player {
   int max_health;
   int attack;
   int defense;
+  int accuracy;
+  int dodge;
   int gold;
   Item *weapon;
   Item *shield;

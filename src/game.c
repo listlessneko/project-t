@@ -21,6 +21,8 @@ Player *create_player() {
   player->max_health = 30;
   player->attack = 5;
   player->defense = 3;
+  player->accuracy = 75;
+  player->dodge = 20;
   player->gold = 0;
   player->inventory_count = 0;
 
@@ -73,7 +75,7 @@ void initialize_visited_rooms(Player *player) {
   return;
 }
 
-Enemy *create_enemy(char *name, int max_health, int attack, int defense) {
+Enemy *create_enemy(char *name, int max_health, int attack, int defense, int accuracy, int dodge) {
   Enemy *enemy = malloc(sizeof(Enemy));
   if (enemy == NULL) {
     return NULL;
@@ -83,6 +85,8 @@ Enemy *create_enemy(char *name, int max_health, int attack, int defense) {
   enemy->health = max_health;
   enemy->attack = attack;
   enemy->defense = defense;
+  enemy->accuracy = accuracy;
+  enemy->dodge = dodge;
   return enemy;
 };
 
