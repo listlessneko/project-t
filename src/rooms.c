@@ -100,40 +100,55 @@ RoomContentsTemplate safe_room_contents_templates[] = {
 
 RoomContentsTemplate easy_room_contents_templates[] = {
   {
+    .kind = ROOM_EASY,
     .enemy_name = "Bandit",
+    .enemy_behavior = BEHAVIOR_COWARDLY,
     .enemy_max_health = 5,
     .enemy_min_health = 3,
     .enemy_max_attack = 2,
     .enemy_min_attack = 1,
     .enemy_max_defense = 2,
     .enemy_min_defense = 1,
-    .kind = ROOM_EASY
+    .enemy_max_accuracy = 60,
+    .enemy_min_accuracy = 40,
+    .enemy_max_dodge = 10,
+    .enemy_min_dodge = 5,
   }
 };
 
 RoomContentsTemplate normal_room_contents_templates[] = {
   {
+    .kind = ROOM_NORMAL,
     .enemy_name = "Raiders",
+    .enemy_behavior = BEHAVIOR_MIXED,
     .enemy_max_health = 8,
     .enemy_min_health = 5,
     .enemy_max_attack = 4,
     .enemy_min_attack = 2,
     .enemy_max_defense = 4,
     .enemy_min_defense = 2,
-    .kind = ROOM_NORMAL
+    .enemy_max_accuracy = 75,
+    .enemy_min_accuracy = 60,
+    .enemy_max_dodge = 20,
+    .enemy_min_dodge = 10,
   }
 };
 
 RoomContentsTemplate hard_room_contents_templates[] = {
   {
+    .kind = ROOM_HARD,
     .enemy_name = "Warrior",
+    .enemy_behavior = BEHAVIOR_AGGRESSIVE,
     .enemy_max_health = 12,
     .enemy_min_health = 8,
     .enemy_max_attack = 8,
     .enemy_min_attack = 5,
     .enemy_max_defense = 8,
     .enemy_min_defense = 5,
-    .kind = ROOM_HARD
+    .enemy_max_accuracy = 85,
+    .enemy_min_accuracy = 75,
+    .enemy_max_dodge = 30,
+    .enemy_min_dodge = 20,
   }
 };
 
@@ -195,6 +210,16 @@ int remove_item_from_room(Room *room, Item *item) {
   return ITEM_REMOVE_FROM_INVENTORY_ERROR;
 }
 
+Enemy *create_room_enemy(RoomContentsTemplate fateful_room_contents) {
+  int fateful_max_health = rand() % (fateful_room_contents.enemy_max_health - fateful_room_contents.enemy_min_health + 1) + fateful_room_contents.enemy_min_health;
+  int fateful_attack = rand() % (fateful_room_contents.enemy_max_attack - fateful_room_contents.enemy_min_attack + 1) + fateful_room_contents.enemy_min_attack;
+  int fateful_defense = rand() % (fateful_room_contents.enemy_max_defense - fateful_room_contents.enemy_min_defense + 1) + fateful_room_contents.enemy_min_defense;
+  int fateful_accuracy = rand() % (fateful_room_contents.enemy_max_accuracy - fateful_room_contents.enemy_min_accuracy + 1) + fateful_room_contents.enemy_min_accuracy;
+  int fateful_dodge = rand() % (fateful_room_contents.enemy_max_dodge - fateful_room_contents.enemy_min_dodge + 1) + fateful_room_contents.enemy_min_dodge;
+  Enemy *enemy = create_enemy(fateful_room_contents.enemy_name, fateful_room_contents.enemy_behavior, fateful_max_health, fateful_attack, fateful_defense, fateful_accuracy, fateful_dodge);
+  return enemy;
+};
+
 void explore_room(Player *player, DirectionKind direction) {
   Room **next = NULL;
   int current_x = player->current_room->x;
@@ -247,6 +272,7 @@ Room *build_room(Player *player, DirectionKind direction) {
     if (new_room == NULL) {
       return NULL;
     }
+    new_room->entity_kind = ENTITY_ROOM;
     new_room->kind = ROOM_SAFE;
     room_kind_counter.safe++;
     strcpy(new_room->name, safe_room_appearance_templates[0].name);
@@ -310,6 +336,7 @@ Room *build_room(Player *player, DirectionKind direction) {
       return NULL;
     }
 
+    new_room->entity_kind = ENTITY_ROOM;
     new_room->kind = current_room_kind;
     int appearance_index = rand() % max_room_kind;
     RoomAppearanceTemplate fateful_room_appearance;
@@ -324,16 +351,19 @@ Room *build_room(Player *player, DirectionKind direction) {
         room_kind_counter.easy++;
         fateful_room_appearance = easy_room_appearance_templates[appearance_index];
         fateful_room_contents = easy_room_contents_templates[0];
+        new_room->enemy = create_room_enemy(fateful_room_contents);
         break;
       case ROOM_NORMAL:
         room_kind_counter.normal++;
         fateful_room_appearance = normal_room_appearance_templates[appearance_index];
         fateful_room_contents = normal_room_contents_templates[0];
+        new_room->enemy = create_room_enemy(fateful_room_contents);
         break;
       case ROOM_HARD:
         room_kind_counter.hard++;
         fateful_room_appearance = hard_room_appearance_templates[room_kind_counter.hard - 1];
         fateful_room_contents = hard_room_contents_templates[0];
+        new_room->enemy = create_room_enemy(fateful_room_contents);
         break;
       default:
         return NULL;
@@ -341,11 +371,6 @@ Room *build_room(Player *player, DirectionKind direction) {
 
     strcpy(new_room->name, fateful_room_appearance.name);
     strcpy(new_room->description, fateful_room_appearance.description);
-    int fateful_max_health = rand() % (fateful_room_contents.enemy_max_health - fateful_room_contents.enemy_min_health + 1) + fateful_room_contents.enemy_min_health;
-    int fateful_attack = rand() % (fateful_room_contents.enemy_max_attack - fateful_room_contents.enemy_min_attack + 1) + fateful_room_contents.enemy_min_attack;
-    int fateful_defense = rand() % (fateful_room_contents.enemy_max_defense - fateful_room_contents.enemy_min_defense + 1) + fateful_room_contents.enemy_min_defense;
-    Enemy *enemy = create_enemy(fateful_room_contents.enemy_name, BEHAVIOR_UNKNOWN, fateful_max_health, fateful_attack, fateful_defense, 75, 25);
-    new_room->enemy = enemy;
   }
 
   if (player->map == NULL) {

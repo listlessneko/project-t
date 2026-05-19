@@ -81,6 +81,7 @@ Enemy *create_enemy(char *name, EnemyBehaviorKind behavior, int max_health, int 
   if (enemy == NULL) {
     return NULL;
   }
+  enemy->entity_kind = ENTITY_ENEMY;
   strcpy(enemy->name, name);
   enemy->behavior = behavior;
   enemy->max_health = max_health;

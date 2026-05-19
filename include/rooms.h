@@ -68,12 +68,17 @@ typedef struct RoomAppearanceTemplate {
 typedef struct RoomContentsTemplate {
   char *enemy_name;
   RoomKind kind;
+  EnemyBehaviorKind enemy_behavior;
   int enemy_max_health;
   int enemy_min_health;
   int enemy_max_attack;
   int enemy_min_attack;
   int enemy_max_defense;
   int enemy_min_defense;
+  int enemy_max_accuracy;
+  int enemy_min_accuracy;
+  int enemy_max_dodge;
+  int enemy_min_dodge;
 } RoomContentsTemplate;
 
 typedef struct VisitedRooms {
