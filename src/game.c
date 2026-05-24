@@ -123,3 +123,34 @@ void start_game(Player *player) {
 void game_loop(Player *player) {
   while(playing(player)) {}
 }
+void combat(Player *player, Enemy *enemy) {
+  if (player == NULL || enemy == NULL) {
+    return;
+  }
+
+  // roll for initiative
+  int initiative = rand() % 2;
+
+  while (combat_ensues(player, enemy)) {
+    // ask player what they will do
+    // receive player's choice
+    // determine enemy's choice
+
+    if (!initiative) {
+      // player action
+      // enemy action
+      if (!combat_ensues(player, enemy)) {
+        break;
+      }
+    } else {
+      // enemy action
+      // player action
+      if (!combat_ensues(player, enemy)) {
+        break;
+      }
+    }
+  }
+
+  // display battle results
+  return;
+}
