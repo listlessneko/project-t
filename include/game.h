@@ -5,6 +5,9 @@
 #include "rooms.h"
 
 #define MAX_INVENTORY_SIZE 12
+#define BASE_HIT_CHANCE 50
+#define MIN_HIT_CHANCE 10
+#define MAX_HIT_CHANCE 100
 
 typedef struct Enemy {
   EntityKind entity_kind;

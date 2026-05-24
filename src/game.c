@@ -123,6 +123,32 @@ void start_game(Player *player) {
 void game_loop(Player *player) {
   while(playing(player)) {}
 }
+
+int combat_ensues(Player *player, Enemy *enemy) {
+  return player->health > 0 && enemy->health > 0;
+}
+
+int clamp(int value, int min, int max) {
+  if (value < min) {
+    return min;
+  } else if (value > max) {
+    return max;
+  } else {
+    return value;
+  }
+}
+
+int hit_chance(int base, int accuracy, int dodge) {
+  int value = base + accuracy - dodge;
+  return clamp(value, MIN_HIT_CHANCE, MAX_HIT_CHANCE);
+}
+
+int attack_lands(int chance) {
+  int r = rand() % 100;
+
+  return r < chance;
+}
+
 void combat(Player *player, Enemy *enemy) {
   if (player == NULL || enemy == NULL) {
     return;
