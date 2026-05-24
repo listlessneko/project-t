@@ -8,6 +8,7 @@
 #define BASE_HIT_CHANCE 50
 #define MIN_HIT_CHANCE 10
 #define MAX_HIT_CHANCE 100
+#define PARTIAL_DEFENSE_FRACTION 0.67
 
 typedef struct Enemy {
   EntityKind entity_kind;

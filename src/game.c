@@ -149,6 +149,46 @@ int attack_lands(int chance) {
   return r < chance;
 }
 
+int damage_dealt(Player *player, Enemy *enemy, int player_is_attacker, int defense_mode) {
+  if (player == NULL || enemy == NULL) {
+    return 0;
+  }
+
+  int attack = 0;
+  int defense = 0;
+  int damage = 0;
+
+  if (player_is_attacker) {
+    attack = player->attack;
+    defense = defense_mode ? enemy->defense : (int)(enemy->defense * PARTIAL_DEFENSE_FRACTION);
+  } else {
+    attack = enemy->attack;
+    defense = defense_mode ? player->defense : (int)(player->defense * PARTIAL_DEFENSE_FRACTION);
+  }
+  damage = attack - defense;
+  damage = damage < 1 ? 0 : damage;
+  return damage;
+}
+
+void deal_damage(EntityKind entity_kind, void *entity, int damage) {
+  switch (entity_kind) {
+    case ENTITY_PLAYER: {
+      Player *player = (Player *)(entity);
+      int health = player->health - damage;
+      player->health = health < 0 ? 0 : health;
+      return;
+    }
+    case ENTITY_ENEMY: {
+      Enemy *enemy = (Enemy *)(entity);
+      int health = enemy->health - damage;
+      enemy->health = health < 0 ? 0 : health;
+      return;
+    }
+    default:
+      return;
+  }
+}
+
 void combat(Player *player, Enemy *enemy) {
   if (player == NULL || enemy == NULL) {
     return;
