@@ -75,15 +75,6 @@ MenuNode view_stats_node = {
   .is_static = 1,
 };
 
-MenuNode fight_node = {
-  .node_kind = NODE_MENU,
-  .data_kind.menu_kind = MENU_FIGHT,
-  .name = { "Fight" },
-  .description = { "Eliminate the enemy." },
-  .key = 'F',
-  .is_static = 1,
-};
-
 MenuNode pick_up_node = {
   .node_kind = NODE_ACTION,
   .data_kind.action_kind = ACTION_PICK_UP_ITEM,
@@ -156,6 +147,42 @@ MenuNode throw_away_node = {
   .is_static = 1,
 };
 
+MenuNode attack_node = {
+  .node_kind = NODE_ACTION,
+  .data_kind.action_kind = ACTION_ATTACK,
+  .name = { "Attack" },
+  .description = { "Attack the enemy." },
+  .key = 'A',
+  .is_static = 1,
+};
+
+MenuNode defend_node = {
+  .node_kind = NODE_ACTION,
+  .data_kind.action_kind = ACTION_DEFEND,
+  .name = { "Defend" },
+  .description = { "Defend against the enemy." },
+  .key = 'D',
+  .is_static = 1,
+};
+
+MenuNode use_item_node = {
+  .node_kind = NODE_ACTION,
+  .data_kind.action_kind = ACTION_USE_INVENTORY_ITEM,
+  .name = { "Use Item" },
+  .description = { "Use an item." },
+  .key = 'U',
+  .is_static = 1,
+};
+
+MenuNode flee_node = {
+  .node_kind = NODE_ACTION,
+  .data_kind.action_kind = ACTION_FLEE,
+  .name = { "Flee" },
+  .description = { "Attempt to flee from the enemy." },
+  .key = 'F',
+  .is_static = 1,
+};
+
 MenuNode prev_node = {
   .node_kind = NODE_ACTION,
   .data_kind.action_kind = ACTION_PREVIOUS_PAGE,
@@ -211,6 +238,7 @@ MenuNode quit_node = {
 };
 
 Menu main_menu = {
+  .menu_kind = MENU_MAIN,
   .name = { "Main Menu" },
   .description = { "This is the main menu." },
   .is_static = 1,
@@ -221,12 +249,12 @@ Menu main_menu = {
   .nodes = {
     &explore_node,
     &view_node,
-    &fight_node,
     &quit_node
   }
 };
 
 Menu view_menu = {
+  .menu_kind = MENU_VIEW,
   .name = { "View" },
   .description = { "This is the view menu." },
   .prev_menu = &main_menu,
@@ -240,6 +268,24 @@ Menu view_menu = {
     &view_equipment_node,
     &view_map_node,
     &view_stats_node,
+    &back_node
+  }
+};
+
+Menu combat_menu = {
+  .menu_kind = MENU_COMBAT,
+  .name = { "Combat" },
+  .description = { "This is the combat menu." },
+  .prev_menu = NULL,
+  .is_static = 1,
+  .prev_page = NULL,
+  .next_page = NULL,
+  .node_count = 5,
+  .nodes = {
+    &attack_node,
+    &defend_node,
+    &use_item_node,
+    &flee_node,
     &back_node
   }
 };
