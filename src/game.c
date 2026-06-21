@@ -197,26 +197,132 @@ void combat(Player *player, Enemy *enemy) {
   // roll for initiative
   int initiative = rand() % 2;
 
-  while (combat_ensues(player, enemy)) {
-    // ask player what they will do
-    // receive player's choice
-    // determine enemy's choice
+  while(combat_ensues(player, enemy)) {
+    player->current_menu = &combat_menu;
+    display_menu(player);
+    char choice[32];
+    read_input(choice, sizeof(choice));
+    MenuNode *menu_node = parse_player_choice(player, choice);
 
-    if (!initiative) {
-      // player action
-      // enemy action
-      if (!combat_ensues(player, enemy)) {
-        break;
+    if (menu_node == NULL) {
+      print_text(PRINT_NORMAL5, "Focus!\n");
+      continue;
+    }
+
+    int player_defense_mode = 0;
+    int player_attempted_to_flee = 0;
+    int enemy_defense_mode = rand() % 2 ? 1 : 0;
+
+    switch (menu_node->node_kind) {
+      case NODE_ACTION: {
+        switch (menu_node->data_kind.action_kind) {
+          case ACTION_ATTACK: {
+            break;
+          }
+          case ACTION_DEFEND: {
+            player_defense_mode = 1;
+            break;
+          }
+          case ACTION_USE_INVENTORY_ITEM:
+          case ACTION_FLEE: {
+            player_attempted_to_flee = 1;
+            print_text(PRINT_NORMAL5, "You cannot run from this challenge...\n");
+            break;
+          }
+          default:
+            break;
+        }
       }
-    } else {
-      // enemy action
-      // player action
-      if (!combat_ensues(player, enemy)) {
+      default:
         break;
+    }
+
+    if (!player_attempted_to_flee) {
+      if (initiative) {
+        if (!player_defense_mode) {
+          if (enemy_defense_mode) {
+            print_text(PRINT_NORMAL5, "The %s shifts into a defensive stance...\n", enemy->name);
+          }
+          int player_chance_to_hit = hit_chance(BASE_HIT_CHANCE, player->accuracy, enemy->dodge);
+          int player_hit_landed = attack_lands(player_chance_to_hit);
+          if (player_hit_landed) {
+            int damage = damage_dealt(player, enemy, 1, enemy_defense_mode);
+            if (damage > 0) {
+              deal_damage(ENTITY_ENEMY, enemy, damage);
+              print_text(PRINT_NORMAL5, "You land an attack! (-%d)\n", damage);
+              if (enemy->health <= 0) {
+                print_text(PRINT_NORMAL5, "You kill the %s.\n", enemy->name);
+                break;
+              }
+            } else {
+              print_text(PRINT_NORMAL5, "You barely left a scratch... (0)\n");
+            }
+          } else {
+            print_text(PRINT_NORMAL5, "You missed! (0)\n");
+          }
+        } else {
+          print_text(PRINT_NORMAL5, "You brace for impact...\n");
+        }
+        if (!enemy_defense_mode) {
+          int enemy_chance_to_hit = hit_chance(BASE_HIT_CHANCE, enemy->accuracy, player->dodge);
+          int enemy_hit_landed = attack_lands(enemy_chance_to_hit);
+          if (enemy_hit_landed) {
+            int damage = damage_dealt(player, enemy, 0, player_defense_mode);
+            if (damage > 0) {
+              deal_damage(ENTITY_PLAYER, player, damage);
+              print_text(PRINT_NORMAL5, "You take a hit! (-%d)\n", damage);
+            } else {
+              print_text(PRINT_NORMAL5, "You deflected their attack! (0)\n");
+            }
+          } else {
+            print_text(PRINT_NORMAL5, "You dodged their attack! (0)\n");
+          }
+        } else {
+          print_text(PRINT_NORMAL5, "The %s shifts into a defensive stance...\n", enemy->name);
+        }
+      } else {
+        if (!enemy_defense_mode) {
+          if (player_defense_mode) {
+            print_text(PRINT_NORMAL5, "You brace for impact...\n");
+          }
+          int enemy_chance_to_hit = hit_chance(BASE_HIT_CHANCE, enemy->accuracy, player->dodge);
+          int enemy_hit_landed = attack_lands(enemy_chance_to_hit);
+          if (enemy_hit_landed) {
+            int damage = damage_dealt(player, enemy, 0, player_defense_mode);
+            if (damage > 0) {
+              deal_damage(ENTITY_PLAYER, player, damage);
+              print_text(PRINT_NORMAL5, "You take a hit! (-%d)\n", damage);
+            } else {
+              print_text(PRINT_NORMAL5, "You deflected their attack! (0)\n");
+            }
+          } else {
+            print_text(PRINT_NORMAL5, "You dodged their attack! (0)\n");
+          }
+        } else {
+          print_text(PRINT_NORMAL5, "The %s shifts into a defensive stance...\n", enemy->name);
+        }
+        if (!player_defense_mode) {
+          int player_chance_to_hit = hit_chance(BASE_HIT_CHANCE, player->accuracy, enemy->dodge);
+          int player_hit_landed = attack_lands(player_chance_to_hit);
+          if (player_hit_landed) {
+            int damage = damage_dealt(player, enemy, 1, enemy_defense_mode);
+            if (damage > 0) {
+              deal_damage(ENTITY_ENEMY, enemy, damage);
+              print_text(PRINT_NORMAL5, "You land an attack! (-%d)\n", damage);
+              if (enemy->health <= 0) {
+                print_text(PRINT_NORMAL5, "You kill the %s.\n", enemy->name);
+                break;
+              }
+            } else {
+              print_text(PRINT_NORMAL5, "You barely left a scratch... (0)\n");
+            }
+          } else {
+            print_text(PRINT_NORMAL5, "You missed! (0)\n");
+          }
+        }
       }
     }
+    print_text(PRINT_NORMAL5, "%s's HP: %d/%d\n", player->name, player->health, player->max_health);
+    print_text(PRINT_NORMAL5, "%s's HP: %d/%d\n", enemy->name, enemy->health, enemy->max_health);
   }
-
-  // display battle results
-  return;
 }

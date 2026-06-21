@@ -103,12 +103,12 @@ RoomContentsTemplate easy_room_contents_templates[] = {
     .kind = ROOM_EASY,
     .enemy_name = "Bandit",
     .enemy_behavior = BEHAVIOR_COWARDLY,
-    .enemy_max_health = 5,
-    .enemy_min_health = 3,
-    .enemy_max_attack = 2,
-    .enemy_min_attack = 1,
-    .enemy_max_defense = 2,
-    .enemy_min_defense = 1,
+    .enemy_max_health = 10,
+    .enemy_min_health = 8,
+    .enemy_max_attack = 3,
+    .enemy_min_attack = 2,
+    .enemy_max_defense = 5,
+    .enemy_min_defense = 3,
     .enemy_max_accuracy = 60,
     .enemy_min_accuracy = 40,
     .enemy_max_dodge = 10,
@@ -121,12 +121,12 @@ RoomContentsTemplate normal_room_contents_templates[] = {
     .kind = ROOM_NORMAL,
     .enemy_name = "Raiders",
     .enemy_behavior = BEHAVIOR_MIXED,
-    .enemy_max_health = 8,
-    .enemy_min_health = 5,
-    .enemy_max_attack = 4,
-    .enemy_min_attack = 2,
-    .enemy_max_defense = 4,
-    .enemy_min_defense = 2,
+    .enemy_max_health = 15,
+    .enemy_min_health = 10,
+    .enemy_max_attack = 5,
+    .enemy_min_attack = 3,
+    .enemy_max_defense = 8,
+    .enemy_min_defense = 5,
     .enemy_max_accuracy = 75,
     .enemy_min_accuracy = 60,
     .enemy_max_dodge = 20,
@@ -139,12 +139,12 @@ RoomContentsTemplate hard_room_contents_templates[] = {
     .kind = ROOM_HARD,
     .enemy_name = "Warrior",
     .enemy_behavior = BEHAVIOR_AGGRESSIVE,
-    .enemy_max_health = 12,
-    .enemy_min_health = 8,
+    .enemy_max_health = 20,
+    .enemy_min_health = 15,
     .enemy_max_attack = 8,
     .enemy_min_attack = 5,
-    .enemy_max_defense = 8,
-    .enemy_min_defense = 5,
+    .enemy_max_defense = 10,
+    .enemy_min_defense = 8,
     .enemy_max_accuracy = 85,
     .enemy_min_accuracy = 75,
     .enemy_max_dodge = 30,
@@ -258,9 +258,10 @@ void explore_room(Player *player, DirectionKind direction) {
     return;
   } else {
     print_text(PRINT_NORMAL5, "[Entered %s]\n", player->current_room->name);
-    // print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
-    // print_text(PRINT_NORMAL5, "You see a %s\n", player->current_room->enemy->name);
-    // print_text(PRINT_NORMAL5, "Health: %d\n", player->current_room->enemy->health);
+    print_text(PRINT_NORMAL5, "%s\n", player->current_room->description);
+    print_text(PRINT_NORMAL5, "You see a %s\n", player->current_room->enemy->name);
+    print_text(PRINT_NORMAL5, "Health: %d\n", player->current_room->enemy->health);
+    combat(player, player->current_room->enemy);
     return;
   }
 }

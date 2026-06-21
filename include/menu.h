@@ -33,6 +33,7 @@ typedef enum MenuKind {
   MENU_FIND_INVENTORY_ITEM_TO_SWAP,
   MENU_SWAP_VIEW_INVENTORY,
   MENU_SWAP_WITH_INVENTORY_ITEM,
+  MENU_COMBAT_INVENTORY,
   MENU_VIEW_MAP,
   MENU_VIEW_STATS,
   MENU_COMBAT
@@ -49,7 +50,6 @@ typedef enum ActionKind {
   ACTION_USE_INVENTORY_ITEM,
   ACTION_DROP_ITEM,
   ACTION_THROW_AWAY_ITEM,
-  ACTION_FIGHT,
   ACTION_ATTACK,
   ACTION_DEFEND,
   ACTION_FLEE,
@@ -97,10 +97,12 @@ typedef struct Menu {
 } Menu;
 
 extern Menu main_menu;
+extern Menu combat_menu;
 
 int playing(Player *player);
 MenuNode *build_menu_node(NodeKind node_kind, void *data);
 MenuNode *build_room_menu_node(DirectionKind direction_kind, Room *room);
 Menu *menu_realloc(Menu *menu, int count);
+Menu *build_menu(MenuKind menu_kind, Player *player);
 void display_menu(Player *player);
 MenuNode *parse_player_choice(Player *player, char *choice);

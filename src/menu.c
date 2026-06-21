@@ -245,7 +245,7 @@ Menu main_menu = {
   .prev_menu = NULL,
   .prev_page = NULL,
   .next_page = NULL,
-  .node_count = 4,
+  .node_count = 3,
   .nodes = {
     &explore_node,
     &view_node,
@@ -611,6 +611,58 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       new_menu = first_page;
       break;
     }
+    case MENU_COMBAT_INVENTORY: {
+      int item_limit = 5;
+      int nav_options = 3;
+      int current_item = 0;
+      int filtered_count = 0;
+      Item **filtered = filtered_inventory(player, player->current_menu->prev_menu->item->kind, &filtered_count);
+      int remaining = filtered_count - current_item;
+      int page_size = remaining > item_limit ? item_limit : remaining;
+      int sub_pages = (filtered_count + item_limit - 1) / item_limit;
+      int current_sub_page = 1;
+
+      Menu *next_page;
+      new_menu = menu_malloc(page_size + nav_options);
+      new_menu->menu_kind = menu_kind;
+      snprintf(new_menu->name, sizeof(new_menu->name), "Inventory:\n (Page %d of %d)", current_sub_page, sub_pages);
+      new_menu->name[63] = '\0';
+      Menu *first_page = new_menu;
+      int i;
+      for (i = 0; i < page_size; i++) {
+        new_menu->nodes[i] = build_view_item_menu_node(MENU_SWAP_WITH_UNEQUIPPED_ITEM, filtered[current_item]);
+        current_item++;
+      }
+      new_menu->nodes[i++] = &prev_node;
+      new_menu->nodes[i++] = &next_node;
+      new_menu->nodes[i++] = &back_node;
+      new_menu->prev_menu = player->current_menu->prev_menu->prev_menu;
+
+      while (current_sub_page < sub_pages) {
+        current_sub_page++;
+        remaining = filtered_count - current_item;
+        page_size = remaining > item_limit ? item_limit : remaining;
+        next_page = menu_malloc(page_size + nav_options);
+        next_page->menu_kind = menu_kind;
+        snprintf(next_page->name, sizeof(next_page->name), "Inventory:\n (Page %d of %d)", current_sub_page, sub_pages);
+        int j;
+        for (j = 0; j < page_size; j++) {
+          next_page->nodes[j] = build_view_item_menu_node(MENU_SWAP_WITH_UNEQUIPPED_ITEM, filtered[current_item]);
+          current_item++;
+        }
+        next_page->nodes[j++] = &prev_node;
+        next_page->nodes[j++] = &next_node;
+        next_page->nodes[j++] = &back_node;
+        next_page->prev_menu = player->current_menu;
+        new_menu->next_page = next_page;
+        next_page->prev_page = new_menu;
+        new_menu = next_page;
+      }
+      new_menu->next_page = first_page;
+      first_page->prev_page = new_menu;
+      new_menu = first_page;
+      break;
+    }
     case MENU_VIEW_MAP: {
       new_menu = menu_malloc(1);
       new_menu->menu_kind = menu_kind;
@@ -624,6 +676,9 @@ Menu *build_menu(MenuKind menu_kind, Player *player) {
       strncpy(new_menu->name, "Stats", sizeof(new_menu->name) - 1);
       new_menu->nodes[0] = &back_node;
       break;
+    }
+    case MENU_COMBAT: {
+      return new_menu = &combat_menu;
     }
     default: {
       new_menu = menu_malloc(1);
@@ -866,7 +921,10 @@ void display_menu(Player *player) {
 }
 
 int perform_action(ActionKind action_kind, Player *player, MenuNode *choice) {
-  MenuKind prev_menu_kind = player->current_menu->prev_menu->menu_kind;
+  MenuKind prev_menu_kind;
+  if (player->current_menu->prev_menu) {
+    prev_menu_kind = player->current_menu->prev_menu->menu_kind;
+  }
   Room *current_room = player->current_room;
   Item *current_item = player->current_menu->item;
 
