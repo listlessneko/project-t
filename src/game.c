@@ -101,7 +101,7 @@ void start_game(Player *player) {
   srand(time(NULL));
   print_text(PRINT_NORMAL5, "What is your name, traveler?\n");
 
-  read_input(player->name, 32);
+  read_input(player->name, 32, INPUT_STR);
 
   print_text(PRINT_NORMAL5, "Hello, %s. It is time to continue your journey.\n", player->name);
   print_text(PRINT_VERY_SLOW50, "...\n");
@@ -200,8 +200,8 @@ void combat(Player *player, Enemy *enemy) {
   while(combat_ensues(player, enemy)) {
     player->current_menu = &combat_menu;
     display_menu(player);
-    char choice[32];
-    read_input(choice, sizeof(choice));
+    char choice[2];
+    read_input(choice, sizeof(choice), INPUT_CHAR);
     MenuNode *menu_node = parse_player_choice(player, choice);
 
     if (menu_node == NULL) {

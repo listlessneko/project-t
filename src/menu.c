@@ -1319,8 +1319,8 @@ MenuNode *parse_player_choice(Player *player, char *choice) {
 int playing(Player *player) {
   print_text(PRINT_FAST3, "(Looping...)\n");
   display_menu(player);
-  char choice[32];
-  read_input(choice, sizeof(choice));
+  char choice[2];
+  read_input(choice, sizeof(choice), INPUT_CHAR);
   print_text(PRINT_FAST3, "Choice: %s\n", choice);
   MenuNode *menu_node = parse_player_choice(player, choice);
   if (menu_node == NULL) {

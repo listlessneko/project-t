@@ -43,10 +43,24 @@
 
 #endif
 
-char *read_input(char *buffer, int size) {
-  disable_raw_mode();
-  fgets(buffer, size, stdin);
-  enable_raw_mode();
+char *read_input(char *buffer, int size, InputType input_type) {
+  switch (input_type) {
+    case INPUT_CHAR: {
+      int ch;
+      do {
+        ch = getchar();
+      } while (ch == '\n' || ch == '\r' || ch == 127 || ch == EOF);
+      buffer[0] = (char)ch;
+      break;
+    }
+    case INPUT_STR:
+      disable_raw_mode();
+      fgets(buffer, size, stdin);
+      enable_raw_mode();
+      break;
+    default:
+      break;
+  }
   buffer[strcspn(buffer, "\n")] = '\0';
   return buffer;
 }

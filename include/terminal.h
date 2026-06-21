@@ -11,4 +11,10 @@
     int kbhit_unix();
 #endif
 
-char *read_input(char *buffer, int size);
+typedef enum InputType {
+  INPUT_UNKNOWN,
+  INPUT_CHAR,
+  INPUT_STR
+} InputType;
+
+char *read_input(char *buffer, int size, InputType input_type);
