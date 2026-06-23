@@ -18,9 +18,9 @@ Player *create_player() {
   }
   player->level = 1;
   player->exp = 0;
-  player->health = 24;
+  player->health = 25;
   player->max_health = 30;
-  player->attack = 5;
+  player->attack = 3;
   player->defense = 3;
   player->accuracy = 75;
   player->dodge = 20;
@@ -143,10 +143,45 @@ int hit_chance(int base, int accuracy, int dodge) {
   return clamp(value, MIN_HIT_CHANCE, MAX_HIT_CHANCE);
 }
 
-int attack_lands(int chance) {
+int chance_succeeds(int chance) {
   int r = rand() % 100;
 
   return r < chance;
+}
+
+int enemy_attack_chance(Enemy *enemy) {
+  if (enemy == NULL) {
+    return 0;
+  }
+
+  int health_percentage = (enemy->health * 100) / enemy->max_health;
+  switch (enemy->behavior) {
+    case BEHAVIOR_COWARDLY: {
+      if (health_percentage > 75) {
+        return 90;
+      } else if (health_percentage > 50) {
+        return 70;
+      } else if (health_percentage <= 50) {
+        return 40;
+      } else {
+        break;
+      }
+    }
+    case BEHAVIOR_AGGRESSIVE: {
+      if (health_percentage > 80) {
+        return 20;
+      } else if (health_percentage > 40) {
+        return 50;
+      } else if (health_percentage <= 40) {
+        return 90;
+      } else {
+        break;
+      }
+    }
+    default:
+      break;
+  }
+  return 50;
 }
 
 int damage_dealt(Player *player, Enemy *enemy, int player_is_attacker, int defense_mode) {
@@ -211,7 +246,9 @@ void combat(Player *player, Enemy *enemy) {
 
     int player_defense_mode = 0;
     int player_attempted_to_flee = 0;
-    int enemy_defense_mode = rand() % 2 ? 1 : 0;
+    int enemy_chance_to_attack = enemy_attack_chance(enemy);
+    int enemy_attack_mode = chance_succeeds(enemy_chance_to_attack);
+    int enemy_defense_mode = enemy_attack_mode ? 0 : 1;
 
     switch (menu_node->node_kind) {
       case NODE_ACTION: {
@@ -244,7 +281,7 @@ void combat(Player *player, Enemy *enemy) {
             print_text(PRINT_NORMAL5, "The %s shifts into a defensive stance...\n", enemy->name);
           }
           int player_chance_to_hit = hit_chance(BASE_HIT_CHANCE, player->accuracy, enemy->dodge);
-          int player_hit_landed = attack_lands(player_chance_to_hit);
+          int player_hit_landed = chance_succeeds(player_chance_to_hit);
           if (player_hit_landed) {
             int damage = damage_dealt(player, enemy, 1, enemy_defense_mode);
             if (damage > 0) {
@@ -265,7 +302,7 @@ void combat(Player *player, Enemy *enemy) {
         }
         if (!enemy_defense_mode) {
           int enemy_chance_to_hit = hit_chance(BASE_HIT_CHANCE, enemy->accuracy, player->dodge);
-          int enemy_hit_landed = attack_lands(enemy_chance_to_hit);
+          int enemy_hit_landed = chance_succeeds(enemy_chance_to_hit);
           if (enemy_hit_landed) {
             int damage = damage_dealt(player, enemy, 0, player_defense_mode);
             if (damage > 0) {
@@ -277,8 +314,6 @@ void combat(Player *player, Enemy *enemy) {
           } else {
             print_text(PRINT_NORMAL5, "You dodged their attack! (0)\n");
           }
-        } else {
-          print_text(PRINT_NORMAL5, "The %s shifts into a defensive stance...\n", enemy->name);
         }
       } else {
         if (!enemy_defense_mode) {
@@ -286,7 +321,7 @@ void combat(Player *player, Enemy *enemy) {
             print_text(PRINT_NORMAL5, "You brace for impact...\n");
           }
           int enemy_chance_to_hit = hit_chance(BASE_HIT_CHANCE, enemy->accuracy, player->dodge);
-          int enemy_hit_landed = attack_lands(enemy_chance_to_hit);
+          int enemy_hit_landed = chance_succeeds(enemy_chance_to_hit);
           if (enemy_hit_landed) {
             int damage = damage_dealt(player, enemy, 0, player_defense_mode);
             if (damage > 0) {
@@ -303,7 +338,7 @@ void combat(Player *player, Enemy *enemy) {
         }
         if (!player_defense_mode) {
           int player_chance_to_hit = hit_chance(BASE_HIT_CHANCE, player->accuracy, enemy->dodge);
-          int player_hit_landed = attack_lands(player_chance_to_hit);
+          int player_hit_landed = chance_succeeds(player_chance_to_hit);
           if (player_hit_landed) {
             int damage = damage_dealt(player, enemy, 1, enemy_defense_mode);
             if (damage > 0) {
